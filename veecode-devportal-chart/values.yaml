@@ -1,0 +1,137 @@
+global:
+  host: ""
+upstream:
+  enabled: true
+  backstage:
+    image:
+      registry: docker.io
+      repository: veecode/devportal-bundle
+      tag: latest
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: debug
+    # workaround para que /app/app-config.yaml e /app/app-config-from-configmap.yaml sejam iguais
+    extraVolumes:
+    - name: app-config
+      configMap:
+        name: veecode-devportal-upstream-app-config
+    extraVolumeMounts:
+    - name: app-config
+      mountPath: /app/app-config.yaml
+      subPath: app-config.yaml
+    appConfig:
+      auth: {}
+        # environment: development
+        # providers:
+        #   guest:
+        #     development:
+        #       enabled: true
+      app:
+        title: "Veecode DevPortal"
+        # Please update to match host in case you don't want to configure hostname via `global.clusterRouterBase` or `global.host` if not deploying on an openshift cluster.
+        baseUrl: 'https://{{- include "veecode.hostname" . }}'
+        support:
+          url: https://github.com/veecode-platform/support/discussions
+          items:
+            - title: Issues
+              icon: github
+              links:
+                - url: https://github.com/veecode-platform/support/discussions
+                  title: GitHub Issues
+        analytics: {}
+      grafana:
+        domain: grafana.localhost
+        unifiedAlerting: true
+      backend:
+        baseUrl: 'https://{{- include "veecode.hostname" . }}'
+        listen:
+          port: 7007
+        logging:
+          level: debug
+        cors:
+          origin: 'https://{{- include "veecode.hostname" . }}'
+        csp:
+          connect-src: ["'self'", "http:", "https:"]
+          img-src:
+            - "'self'"
+            - "data:"
+            - "https://raw.githubusercontent.com/"
+            - "https://avatars.githubusercontent.com/"
+            - "https://veecode-platform.github.io"
+          script-src:
+            - "'self'"
+            - "'unsafe-eval'"
+            - "https://www.google-analytics.com"
+            - "https://www.googletagmanager.com"
+        reading:
+          allow:
+            - host: example.com
+            - host: "*.mozilla.org"
+        database:
+          client: better-sqlite3
+          connection: ':memory:'
+      organization:
+        name: Veecode Platform Devportal
+      techdocs:
+        builder: "local"
+        generator:
+          runIn: "local"
+        publisher:
+          type: "local"
+      integrations: {}
+      scaffolder:
+        defaultAuthor:
+          name: "Scaffolder"
+          email: "scaffolder@vee.codes"
+        defaultCommitMessage: "initial project commit"
+      catalog:
+        orphanStrategy: "delete"
+        rules:
+          - allow:
+              - "Component"
+              - "API"
+              - "Location"
+              - "Cluster"
+              - "Template"
+              - "Environment"
+              - "Database"
+              - "Vault"
+              - "Infracost"
+              - "Group"
+              - "User"
+        providers: {}
+      enabledPlugins:
+        rbac: false
+        vault: false
+        grafana: false
+        kubernetes: false
+        argocd: false
+        gitlabPlugin: false
+        keycloak: false
+        azureDevops: false
+        infracost: false
+        kong: false
+        vee: false
+        sonarqube: false
+        gitlab: false
+        github: false
+      permission:
+        enabled: false
+      platform:
+        signInProviders: {}
+        guest:
+          enabled: false
+          demo: false
+        apiManagement:
+          enabled: false
+          readOnlyMode: false
+        defaultGroup:
+          enabled: false
+        group:
+          admin: platform-admin
+          user: platform-user
+        behaviour:
+          mode: "product"
+        logo:
+          icon: https://veecode-platform.github.io/support/logos/logo-mobile.png
+          full: https://veecode-platform.github.io/support/logos/logo.svg

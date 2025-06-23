@@ -34,3 +34,8 @@ kubectl exec -it $POD -- cat /app/app-config-from-configmap.yaml
 
 ## Release
 
+Increment version in Chart.yaml and package + index a new release:
+
+```bash
+make release
+```

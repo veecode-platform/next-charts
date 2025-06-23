@@ -53,7 +53,10 @@ if [[ $CHART_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
   sed -i '' "s/^version: .*/version: $NEW_CHART_VERSION/" "$CHART_FILE"
   echo "Chart.yaml version bumped to $NEW_CHART_VERSION"
 else
-  echo "Warning: Chart version $CHART_VERSION is not in semver format, not incremented."
+  echo "Warning: Chart version $CHART_VERSION is not in semver format, not incremented and aborting."
+  exit 3
 fi
 
 echo "Updated $VALUES_FILE and $CHART_FILE to tag $NEW_TAG."
+echo "Please commit and push this to main before running 'make release' again."
+exit 2

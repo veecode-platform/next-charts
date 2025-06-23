@@ -3,9 +3,16 @@ CHART_DIR := $(CHART_NAME)
 CHART_PACKAGE := $(CHART_NAME)-*.tgz
 CHARTS_DIR := charts
 
-.PHONY: all deps package index publish clean
+.PHONY: all deps package index publish clean release
 
 all: publish
+
+release:
+	./update_version.sh
+	@echo "RELEASE"
+#	$(MAKE) package
+#	$(MAKE) index
+#	$(MAKE) publish
 
 deps:
 	cd $(CHART_DIR) && helm dependency update

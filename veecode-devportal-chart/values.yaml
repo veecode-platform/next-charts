@@ -6,7 +6,7 @@ upstream:
     image:
       registry: docker.io
       repository: veecode/devportal-bundle
-      tag: latest
+      tag: 0.23.2
     extraEnvVars:
       - name: LOG_LEVEL
         value: debug

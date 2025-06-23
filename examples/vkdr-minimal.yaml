@@ -9,6 +9,10 @@
 # kubectl create secret generic my-backstage-secrets \
 #   --from-literal=BACKEND_AUTH_SECRET_KEY=66459a4032ff4702a39175bcf1f9a3b4
 #
+# instalação local:
+#
+# helm upgrade --install veecode-devportal ./veecode-devportal-chart -f examples/vkdr-minimal.yaml
+#
 global:
   host: devportal.localhost
 upstream:

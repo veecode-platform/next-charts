@@ -10,9 +10,7 @@ all: publish
 release:
 	./update_version.sh
 	@echo "RELEASE"
-#	$(MAKE) package
-#	$(MAKE) index
-#	$(MAKE) publish
+	$(MAKE) publish
 
 deps:
 	cd $(CHART_DIR) && helm dependency update

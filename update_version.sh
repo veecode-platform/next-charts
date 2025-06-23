@@ -32,16 +32,13 @@ CHART_VERSION=$(grep '^version:' "$CHART_FILE" | awk '{print $2}')
 
 if [ "$NEW_TAG" = "$CURRENT_TAG" ] && [ "$NEW_TAG" = "$CURRENT_APP_VERSION" ]; then
   echo "No update needed. Current tag and appVersion already set to $NEW_TAG."
-  exit 0
+else
+  echo "Updating to version: $NEW_TAG"
+  # Update values.yaml (image tag)
+  sed -i '' "s/^\([[:space:]]*tag: \).*/\1$NEW_TAG/" "$VALUES_FILE"
+  # Update Chart.yaml (appVersion)
+  sed -i '' "s/^appVersion: .*/appVersion: \"$NEW_TAG\"/" "$CHART_FILE"
 fi
-
-echo "Updating to version: $NEW_TAG"
-
-# Update values.yaml (image tag)
-sed -i '' "s/^\([[:space:]]*tag: \).*/\1$NEW_TAG/" "$VALUES_FILE"
-
-# Update Chart.yaml (appVersion)
-sed -i '' "s/^appVersion: .*/appVersion: \"$NEW_TAG\"/" "$CHART_FILE"
 
 # Increment Chart.yaml version (patch)
 if [[ $CHART_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
@@ -58,5 +55,4 @@ else
 fi
 
 echo "Updated $VALUES_FILE and $CHART_FILE to tag $NEW_TAG."
-echo "Please commit and push this to main before running 'make release' again."
-exit 2
+echo "Please remember commit and push this to main before running 'make release' again."

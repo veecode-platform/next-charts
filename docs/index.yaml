@@ -3,7 +3,23 @@ entries:
   veecode-devportal:
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2025-06-23T18:21:53.085224-03:00"
+    created: "2025-06-23T21:46:11.533387-03:00"
+    dependencies:
+    - alias: upstream
+      name: backstage
+      repository: https://backstage.github.io/charts
+      version: 2.5.2
+    description: Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage
+      chart
+    digest: 2fb61308a2093b9c65c42c2c18609a8bde78a8a1c11c4ef3f95cabf6d602cc67
+    name: veecode-devportal
+    type: application
+    urls:
+    - https://veecode-platform.github.io/next-charts/veecode-devportal-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 0.23.2
+    created: "2025-06-23T21:46:11.528689-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -17,4 +33,4 @@ entries:
     urls:
     - https://veecode-platform.github.io/next-charts/veecode-devportal-1.0.1.tgz
     version: 1.0.1
-generated: "2025-06-23T18:21:53.080657-03:00"
+generated: "2025-06-23T21:46:11.522945-03:00"

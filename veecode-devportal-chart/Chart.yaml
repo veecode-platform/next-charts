@@ -2,7 +2,7 @@ apiVersion: v2
 name: veecode-devportal
 description: Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage chart
 type: application
-version: 1.0.1
+version: 1.0.2
 appVersion: "0.23.2"
 dependencies:
   - name: backstage

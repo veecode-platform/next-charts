@@ -4,8 +4,7 @@ Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage chart
 
 ![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.23.2](https://img.shields.io/badge/AppVersion-0.23.2-informational?style=flat-square)
 
-This is a good example of all the fields that don't appear when they aren't set in chart metadata. `description`,
-`requirements`, and `values` are all empty and don't appear here.
+This is VeeCode DevPortal new Helm Chart, wrapping the official Backstage chart.
 
 ## Requirements
 

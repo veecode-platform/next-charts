@@ -1,82 +1,113 @@
-
-Veecode-devportal
-===========
+# veecode-devportal
 
 Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage chart
 
+![Version: 1.0.2](https://img.shields.io/badge/Version-1.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.23.2](https://img.shields.io/badge/AppVersion-0.23.2-informational?style=flat-square)
 
-## Configuration
+This is a good example of all the fields that don't appear when they aren't set in chart metadata. `description`,
+`requirements`, and `values` are all empty and don't appear here.
 
-The following table lists the configurable parameters of the Veecode-devportal chart and their default values.
+## Requirements
 
-| Parameter                | Description             | Default        |
-| ------------------------ | ----------------------- | -------------- |
-| `global.host` |  | `""` |
-| `upstream.enabled` |  | `true` |
-| `upstream.postgresql.enabled` |  | `false` |
-| `upstream.backstage.image.registry` |  | `"docker.io"` |
-| `upstream.backstage.image.repository` |  | `"veecode/devportal-bundle"` |
-| `upstream.backstage.image.tag` |  | `"0.23.2"` |
-| `upstream.backstage.extraEnvVars` |  | `[{"name": "LOG_LEVEL", "value": "debug"}]` |
-| `upstream.backstage.extraVolumes` |  | `[{"name": "app-config", "configMap": {"name": "veecode-devportal-upstream-app-config"}}]` |
-| `upstream.backstage.extraVolumeMounts` |  | `[{"name": "app-config", "mountPath": "/app/app-config.yaml", "subPath": "app-config.yaml"}]` |
-| `upstream.backstage.appConfig.auth` |  | `null` |
-| `upstream.backstage.appConfig.app.title` |  | `"Veecode DevPortal"` |
-| `upstream.backstage.appConfig.app.baseUrl` |  | `"https://- include \"veecode.hostname\" . "` |
-| `upstream.backstage.appConfig.app.support.url` |  | `"https://github.com/veecode-platform/support/discussions"` |
-| `upstream.backstage.appConfig.app.support.items` |  | `[{"title": "Issues", "icon": "github", "links": [{"url": "https://github.com/veecode-platform/support/discussions", "title": "GitHub Issues"}]}]` |
-| `upstream.backstage.appConfig.app.analytics` |  | `null` |
-| `upstream.backstage.appConfig.grafana.domain` |  | `"grafana.localhost"` |
-| `upstream.backstage.appConfig.grafana.unifiedAlerting` |  | `true` |
-| `upstream.backstage.appConfig.backend.baseUrl` |  | `"https://- include \"veecode.hostname\" . "` |
-| `upstream.backstage.appConfig.backend.listen.port` |  | `7007` |
-| `upstream.backstage.appConfig.backend.logging.level` |  | `"debug"` |
-| `upstream.backstage.appConfig.backend.cors.origin` |  | `"https://- include \"veecode.hostname\" . "` |
-| `upstream.backstage.appConfig.backend.csp.connect-src` |  | `["'self'", "http:", "https:"]` |
-| `upstream.backstage.appConfig.backend.csp.img-src` |  | `["'self'", "data:", "https://raw.githubusercontent.com/", "https://avatars.githubusercontent.com/", "https://veecode-platform.github.io"]` |
-| `upstream.backstage.appConfig.backend.csp.script-src` |  | `["'self'", "'unsafe-eval'", "https://www.google-analytics.com", "https://www.googletagmanager.com"]` |
-| `upstream.backstage.appConfig.backend.reading.allow` |  | `[{"host": "example.com"}, {"host": "*.mozilla.org"}]` |
-| `upstream.backstage.appConfig.backend.database.client` |  | `"better-sqlite3"` |
-| `upstream.backstage.appConfig.backend.database.connection` |  | `":memory:"` |
-| `upstream.backstage.appConfig.organization.name` |  | `"Veecode Platform Devportal"` |
-| `upstream.backstage.appConfig.techdocs.builder` |  | `"local"` |
-| `upstream.backstage.appConfig.techdocs.generator.runIn` |  | `"local"` |
-| `upstream.backstage.appConfig.techdocs.publisher.type` |  | `"local"` |
-| `upstream.backstage.appConfig.integrations` |  | `null` |
-| `upstream.backstage.appConfig.scaffolder.defaultAuthor.name` |  | `"Scaffolder"` |
-| `upstream.backstage.appConfig.scaffolder.defaultAuthor.email` |  | `"scaffolder@vee.codes"` |
-| `upstream.backstage.appConfig.scaffolder.defaultCommitMessage` |  | `"initial project commit"` |
-| `upstream.backstage.appConfig.catalog.orphanStrategy` |  | `"delete"` |
-| `upstream.backstage.appConfig.catalog.rules` |  | `[{"allow": ["Component", "API", "Location", "Cluster", "Template", "Environment", "Database", "Vault", "Infracost", "Group", "User"]}]` |
-| `upstream.backstage.appConfig.catalog.providers` |  | `null` |
-| `upstream.backstage.appConfig.enabledPlugins.rbac` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.vault` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.grafana` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.kubernetes` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.argocd` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.gitlabPlugin` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.keycloak` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.azureDevops` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.infracost` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.kong` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.vee` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.sonarqube` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.gitlab` |  | `false` |
-| `upstream.backstage.appConfig.enabledPlugins.github` |  | `false` |
-| `upstream.backstage.appConfig.permission.enabled` |  | `false` |
-| `upstream.backstage.appConfig.platform.signInProviders` |  | `null` |
-| `upstream.backstage.appConfig.platform.guest.enabled` |  | `false` |
-| `upstream.backstage.appConfig.platform.guest.demo` |  | `false` |
-| `upstream.backstage.appConfig.platform.apiManagement.enabled` |  | `false` |
-| `upstream.backstage.appConfig.platform.apiManagement.readOnlyMode` |  | `false` |
-| `upstream.backstage.appConfig.platform.defaultGroup.enabled` |  | `false` |
-| `upstream.backstage.appConfig.platform.group.admin` |  | `"platform-admin"` |
-| `upstream.backstage.appConfig.platform.group.user` |  | `"platform-user"` |
-| `upstream.backstage.appConfig.platform.behaviour.mode` |  | `"product"` |
-| `upstream.backstage.appConfig.platform.logo.icon` |  | `"https://veecode-platform.github.io/support/logos/logo-mobile.png"` |
-| `upstream.backstage.appConfig.platform.logo.full` |  | `"https://veecode-platform.github.io/support/logos/logo.svg"` |
+| Repository | Name | Version |
+|------------|------|---------|
+| https://backstage.github.io/charts | upstream(backstage) | 2.5.2 |
 
+## Values
 
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| global.host | string | `""` |  |
+| upstream.backstage.appConfig.app.analytics | object | `{}` |  |
+| upstream.backstage.appConfig.app.baseUrl | string | `"https://{{- include \"veecode.hostname\" . }}"` |  |
+| upstream.backstage.appConfig.app.support.items[0].icon | string | `"github"` |  |
+| upstream.backstage.appConfig.app.support.items[0].links[0].title | string | `"GitHub Issues"` |  |
+| upstream.backstage.appConfig.app.support.items[0].links[0].url | string | `"https://github.com/veecode-platform/support/discussions"` |  |
+| upstream.backstage.appConfig.app.support.items[0].title | string | `"Issues"` |  |
+| upstream.backstage.appConfig.app.support.url | string | `"https://github.com/veecode-platform/support/discussions"` |  |
+| upstream.backstage.appConfig.app.title | string | `"Veecode DevPortal"` |  |
+| upstream.backstage.appConfig.auth | object | `{}` |  |
+| upstream.backstage.appConfig.backend.baseUrl | string | `"https://{{- include \"veecode.hostname\" . }}"` |  |
+| upstream.backstage.appConfig.backend.cors.origin | string | `"https://{{- include \"veecode.hostname\" . }}"` |  |
+| upstream.backstage.appConfig.backend.csp.connect-src[0] | string | `"'self'"` |  |
+| upstream.backstage.appConfig.backend.csp.connect-src[1] | string | `"http:"` |  |
+| upstream.backstage.appConfig.backend.csp.connect-src[2] | string | `"https:"` |  |
+| upstream.backstage.appConfig.backend.csp.img-src[0] | string | `"'self'"` |  |
+| upstream.backstage.appConfig.backend.csp.img-src[1] | string | `"data:"` |  |
+| upstream.backstage.appConfig.backend.csp.img-src[2] | string | `"https://raw.githubusercontent.com/"` |  |
+| upstream.backstage.appConfig.backend.csp.img-src[3] | string | `"https://avatars.githubusercontent.com/"` |  |
+| upstream.backstage.appConfig.backend.csp.img-src[4] | string | `"https://veecode-platform.github.io"` |  |
+| upstream.backstage.appConfig.backend.csp.script-src[0] | string | `"'self'"` |  |
+| upstream.backstage.appConfig.backend.csp.script-src[1] | string | `"'unsafe-eval'"` |  |
+| upstream.backstage.appConfig.backend.csp.script-src[2] | string | `"https://www.google-analytics.com"` |  |
+| upstream.backstage.appConfig.backend.csp.script-src[3] | string | `"https://www.googletagmanager.com"` |  |
+| upstream.backstage.appConfig.backend.database.client | string | `"better-sqlite3"` |  |
+| upstream.backstage.appConfig.backend.database.connection | string | `":memory:"` |  |
+| upstream.backstage.appConfig.backend.listen.port | int | `7007` |  |
+| upstream.backstage.appConfig.backend.logging.level | string | `"debug"` |  |
+| upstream.backstage.appConfig.backend.reading.allow[0].host | string | `"example.com"` |  |
+| upstream.backstage.appConfig.backend.reading.allow[1].host | string | `"*.mozilla.org"` |  |
+| upstream.backstage.appConfig.catalog.orphanStrategy | string | `"delete"` |  |
+| upstream.backstage.appConfig.catalog.providers | object | `{}` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[0] | string | `"Component"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[10] | string | `"User"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[1] | string | `"API"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[2] | string | `"Location"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[3] | string | `"Cluster"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[4] | string | `"Template"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[5] | string | `"Environment"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[6] | string | `"Database"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[7] | string | `"Vault"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[8] | string | `"Infracost"` |  |
+| upstream.backstage.appConfig.catalog.rules[0].allow[9] | string | `"Group"` |  |
+| upstream.backstage.appConfig.enabledPlugins.argocd | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.azureDevops | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.github | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.gitlab | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.gitlabPlugin | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.grafana | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.infracost | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.keycloak | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.kong | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.kubernetes | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.rbac | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.sonarqube | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.vault | bool | `false` |  |
+| upstream.backstage.appConfig.enabledPlugins.vee | bool | `false` |  |
+| upstream.backstage.appConfig.grafana.domain | string | `"grafana.localhost"` |  |
+| upstream.backstage.appConfig.grafana.unifiedAlerting | bool | `true` |  |
+| upstream.backstage.appConfig.integrations | object | `{}` |  |
+| upstream.backstage.appConfig.organization.name | string | `"Veecode Platform Devportal"` |  |
+| upstream.backstage.appConfig.permission.enabled | bool | `false` |  |
+| upstream.backstage.appConfig.platform.apiManagement.enabled | bool | `false` |  |
+| upstream.backstage.appConfig.platform.apiManagement.readOnlyMode | bool | `false` |  |
+| upstream.backstage.appConfig.platform.behaviour.mode | string | `"product"` |  |
+| upstream.backstage.appConfig.platform.defaultGroup.enabled | bool | `false` |  |
+| upstream.backstage.appConfig.platform.group.admin | string | `"platform-admin"` |  |
+| upstream.backstage.appConfig.platform.group.user | string | `"platform-user"` |  |
+| upstream.backstage.appConfig.platform.guest.demo | bool | `false` |  |
+| upstream.backstage.appConfig.platform.guest.enabled | bool | `false` |  |
+| upstream.backstage.appConfig.platform.logo.full | string | `"https://veecode-platform.github.io/support/logos/logo.svg"` |  |
+| upstream.backstage.appConfig.platform.logo.icon | string | `"https://veecode-platform.github.io/support/logos/logo-mobile.png"` |  |
+| upstream.backstage.appConfig.platform.signInProviders | object | `{}` |  |
+| upstream.backstage.appConfig.scaffolder.defaultAuthor.email | string | `"scaffolder@vee.codes"` |  |
+| upstream.backstage.appConfig.scaffolder.defaultAuthor.name | string | `"Scaffolder"` |  |
+| upstream.backstage.appConfig.scaffolder.defaultCommitMessage | string | `"initial project commit"` |  |
+| upstream.backstage.appConfig.techdocs.builder | string | `"local"` |  |
+| upstream.backstage.appConfig.techdocs.generator.runIn | string | `"local"` |  |
+| upstream.backstage.appConfig.techdocs.publisher.type | string | `"local"` |  |
+| upstream.backstage.extraEnvVars[0].name | string | `"LOG_LEVEL"` |  |
+| upstream.backstage.extraEnvVars[0].value | string | `"debug"` |  |
+| upstream.backstage.extraVolumeMounts[0].mountPath | string | `"/app/app-config.yaml"` |  |
+| upstream.backstage.extraVolumeMounts[0].name | string | `"app-config"` |  |
+| upstream.backstage.extraVolumeMounts[0].subPath | string | `"app-config.yaml"` |  |
+| upstream.backstage.extraVolumes[0].configMap.name | string | `"veecode-devportal-upstream-app-config"` |  |
+| upstream.backstage.extraVolumes[0].name | string | `"app-config"` |  |
+| upstream.backstage.image.registry | string | `"docker.io"` |  |
+| upstream.backstage.image.repository | string | `"veecode/devportal-bundle"` |  |
+| upstream.backstage.image.tag | string | `"0.23.2"` |  |
+| upstream.enabled | bool | `true` |  |
+| upstream.postgresql.enabled | bool | `false` |  |
 
-
-
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.14.2](https://github.com/norwoodj/helm-docs/releases/v1.14.2)

@@ -32,6 +32,12 @@ POD=$(kubectl get pods | grep "^veecode-devportal-upstream" | awk '{print $1}')
 kubectl exec -it $POD -- cat /app/app-config-from-configmap.yaml
 ```
 
+## Generate chart README.md
+
+```bash
+helm-docs
+```
+
 ## Release
 
 Increment version in Chart.yaml and package + index a new release:

@@ -1,0 +1,10 @@
+---
+chart-dirs:
+  - ./veecode-devportal-chart
+output-file: README.md
+# template-file: .helm-docs.gotmpl
+# ignore-dirs:
+#   - "testdata"
+# sort-values-order: false
+# sort-files-order: false
+# sort-charts-order: false

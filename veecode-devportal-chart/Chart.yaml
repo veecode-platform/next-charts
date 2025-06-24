@@ -4,6 +4,16 @@ description: Parent Helm Chart for VeeCode DevPortal, wrapping the official Back
 type: application
 version: 1.0.2
 appVersion: "0.23.2"
+home: https://platform.vee.codes/
+icon: https://platform.vee.codes/android-chrome-512x512.png
+sources: ["https://github.com/veecode-platform/next-charts"]
+keywords:
+- veecode
+- platform
+- devportal
+- backstage
+- api management
+- idp
 dependencies:
   - name: backstage
     repository: https://backstage.github.io/charts

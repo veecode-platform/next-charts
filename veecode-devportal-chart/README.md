@@ -16,7 +16,7 @@ This is VeeCode DevPortal new Helm Chart, wrapping the official Backstage chart.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| global.host | string | `""` |  |
+| global.host | string | `""` | The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes) |
 | upstream.backstage.appConfig.app.analytics | object | `{}` |  |
 | upstream.backstage.appConfig.app.baseUrl | string | `"https://{{- include \"veecode.hostname\" . }}"` |  |
 | upstream.backstage.appConfig.app.support.items[0].icon | string | `"github"` |  |
@@ -102,9 +102,9 @@ This is VeeCode DevPortal new Helm Chart, wrapping the official Backstage chart.
 | upstream.backstage.extraVolumeMounts[0].subPath | string | `"app-config.yaml"` |  |
 | upstream.backstage.extraVolumes[0].configMap.name | string | `"veecode-devportal-upstream-app-config"` |  |
 | upstream.backstage.extraVolumes[0].name | string | `"app-config"` |  |
-| upstream.backstage.image.registry | string | `"docker.io"` |  |
-| upstream.backstage.image.repository | string | `"veecode/devportal-bundle"` |  |
-| upstream.backstage.image.tag | string | `"0.23.2"` |  |
+| upstream.backstage.image.registry | string | `"docker.io"` | registry da imagem (default é o Docker Hub) |
+| upstream.backstage.image.repository | string | `"veecode/devportal-bundle"` | nome da imagem |
+| upstream.backstage.image.tag | string | `"0.23.2"` | tag da imagem |
 | upstream.enabled | bool | `true` |  |
 | upstream.postgresql.enabled | bool | `false` |  |
 

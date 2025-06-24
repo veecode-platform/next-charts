@@ -1,4 +1,6 @@
+# global definitions visible in subcharts too
 global:
+  # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
   host: ""
 upstream:
   enabled: true
@@ -6,9 +8,13 @@ upstream:
     enabled: false
   backstage:
     image:
+      # -- image registry (default is Docker Hub)
       registry: docker.io
+      # -- image name
       repository: veecode/devportal-bundle
+      # -- image tag
       tag: 0.23.2
+    # -- additional environment variables
     extraEnvVars:
       - name: LOG_LEVEL
         value: debug

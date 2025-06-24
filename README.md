@@ -34,6 +34,8 @@ kubectl exec -it $POD -- cat /app/app-config-from-configmap.yaml
 
 ## Generate chart README.md
 
+Improve documentation in `veecode-devportal-chart/README.md.gotmpl` and run:
+
 ```bash
 helm-docs
 ```

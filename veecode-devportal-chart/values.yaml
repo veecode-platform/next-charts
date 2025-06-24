@@ -2,6 +2,8 @@ global:
   host: ""
 upstream:
   enabled: true
+  postgresql:
+    enabled: false
   backstage:
     image:
       registry: docker.io

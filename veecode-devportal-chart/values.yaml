@@ -4,6 +4,8 @@ global:
   host: ""
 upstream:
   enabled: true
+  serviceAccount:
+    create: true
   postgresql:
     enabled: false
   backstage:

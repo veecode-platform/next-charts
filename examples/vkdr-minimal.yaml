@@ -17,6 +17,7 @@ global:
   host: devportal.localhost
 upstream:
   enabled: true
+  fullnameOverride: veecode-devportal
   backstage:
     extraEnvVarsSecrets:
       - my-backstage-secrets

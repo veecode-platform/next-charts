@@ -2,10 +2,13 @@
 global:
   # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
   host: ""
+createClusterRoles:
+  enabled: true
 upstream:
   enabled: true
   serviceAccount:
     create: true
+    name: veecode-devportal-sa
   postgresql:
     enabled: false
   backstage:

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ printf "%s-dynamic-plugins" .Release.Name }}
+  name: veecode-devportal-dynamic-plugins 
 data:
   dynamic-plugins.yaml: |
     {{- $dynamic := deepCopy .Values.global.dynamic }}

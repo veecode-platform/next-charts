@@ -1,117 +1,431 @@
-# global definitions visible in subcharts too
 global:
-  # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
-  host: ""
+  dynamic:
+    plugins:
+      # VeeCode Homepage
+      - package: '@veecode-platform/plugin-veecode-homepage-dynamic@0.1.9'
+        disabled: false
+        integrity: sha512-MFv33GyxK+0/BqnAKPvZjC8Iw9V6fgFdUwcTGlFiSZElRM/4ncf9LVc2wo+aC5h0kO2svIuQeXVjP5q2jPlUhg==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.plugin-veecode-homepage:
+                dynamicRoutes:
+                  - path: /
+                    importName: VeecodeHomepagePage
+                    config:
+                      props:
+                        width: 1500
+                        height: 800
+      # Github Workflows
+      - package: '@veecode-platform/backstage-plugin-github-workflows-dynamic@0.1.0'
+        disabled: false
+        integrity: sha512-gdCO5aSVNs2gwAU6bx17Bdt34G5xtb8EXCoCDIeKTlG7/vIB8xzCIxPIiNVLWkAp6v8lw+kdnF25/3GceOhskQ==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.plugin-github-workflows-dynamic:
+                mountPoints:
+                  - mountPoint: entity.page.overview/cards
+                    importName: GithubWorkflowsOverviewContent
+                    config:
+                      layout:
+                        gridColumnEnd:
+                          lg: 'span 8'
+                          md: 'span 6'
+                          xs: 'span 12'
+                      if:
+                        allOf:
+                          - isGithubWorkflowsAvailable
+                  - mountPoint: entity.page.ci/cards
+                    importName: GithubWorkflowsTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf:
+                          - isGithubAvailable
+      # Gitlab Pipelines
+      - package: '@veecode-platform/backstage-plugin-gitlab-pipelines-dynamic@0.1.0'
+        disabled: false
+        integrity: sha512-IPIfKbdShbUng8S9QygPWx9wmn7hbw1W6iAXZ4xZC9REN05IZWedWjawp1iipXfMG3oA9c3L4qAC7ztMftbEfQ==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.backstage-plugin-gitlab-pipelines-dynamic:
+                mountPoints:
+                  - mountPoint: entity.page.overview/cards
+                    importName: GitlabPipelinesOverviewContent
+                    config:
+                      layout:
+                        gridColumnEnd:
+                          lg: 'span 8'
+                          md: 'span 6'
+                          xs: 'span 12'
+                      if:
+                        allOf:
+                          - isGitlabJobsAvailable
+                  - mountPoint: entity.page.ci/cards
+                    importName: GitlabPipelinesTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf:
+                          - isGitlabAvailable
+      # Infracost
+      - package: '@veecode-platform/backstage-plugin-infracost-dynamic@0.1.0'
+        disabled: false
+        integrity: sha512-zGOe18uSIYBApBigXu1T4LjEvfGOvr/W1fBAzdvMJE1q3QNOrpMi/bPXalSIQuS6KiWyX6ps/JF9IAcpZSbCNA==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.backstage-plugin-infracost-dynamic:
+                entityTabs:
+                  - path: /infracost
+                    title: infracost
+                    mountPoint: entity.page.infracost/cards
+                    importName: InfracostTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf:
+                          - isInfracostAvailable
+      # Kubernetes GPT Analyzer
+      - package: '@veecode-platform/backstage-plugin-kubernetes-gpt-analyzer-dynamic@0.1.0'
+        disabled: false
+        integrity: sha512-ZajRQmYkYcP7MJYva0PISqTqJ8+UDXJL2hxIAgYhprOPMzEqXMtze+/wvPAjcgl/nOuNt+Q+ZQNFRDqZ2BCQUg==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.backstage-plugin-kubernetes-gpt-analyzer-dynamic:
+                mountPoints: 
+                  - mountPoint: entity.page.overview/cards
+                    importName: KubernetesGPTAnalyzerOverviewContent
+                    config:
+                      layout:
+                        gridColumnEnd:
+                          lg: 'span 4'
+                          md: 'span 6'
+                          xs: 'span 12'
+                      if:
+                        allOf:
+                          - isKubernetesAvailable
+                entityTabs:
+                  - path: /kubernetes-gpt-analyzer
+                    title: Kubernetes GPT
+                    mountPoint: entity.page.kubernetes-gpt-analyzer
+                    importName: KubernetesGPTAnalyzerTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf:
+                          - isKubernetesAvailable
+      # Zora OSS
+      - package: '@veecode-platform/backstage-plugin-zora-oss-dynamic@0.1.0'
+        disabled: false
+        integrity: sha512-wayuoYWaOqp9neoRePEzo/qbBMKR3vBta/meOGdJ8+p6Ze4KjYWgXKjkKzsxSdmg2uYpDwgrAv/+gedmweJ9Xw==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.backstage-plugin-zora-oss-dynamic:
+                mountPoints:
+                  - mountPoint: entity.page.overview/cards
+                    importName: ZoraOverviewProjectContent
+                    config:
+                      layout:
+                        gridColumnEnd:
+                          lg: 'span 4'
+                          md: 'span 6'
+                          xs: 'span 12'
+                      if:
+                        allOf|anyOf|oneOf:
+                          - isZoraProject
+                entityTabs:
+                  - path: /zora-project
+                    title: Zora
+                    mountPoint: entity.page.zora
+                    importName: ZoraOSSProjectTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf|anyOf|oneOf:
+                          - isZoraProject
+                  - path: /zora-cluster
+                    mountPoint: entity.page.zora
+                    importName: ZoraOSSClusterTabContent
+                    config:
+                      layout:
+                        gridColumn: '1 / -1'
+                      if:
+                        allOf|anyOf|oneOf:
+                          - isZoraAvailable
+                          - isKind: Cluster
+
+                          - isGithubPullRequestsAvailable
+
 upstream:
-  enabled: true
-  serviceAccount:
-    create: true
+  fullnameOverride: veecode-devportal
+  podSecurityContext:
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
   postgresql:
     enabled: false
   backstage:
+    replicas: 1
+    command: []
+    containerSecurityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: true
+      seccompProfile:
+        type: "RuntimeDefault"
+    resources:
+      limits:
+        cpu: 900m
+        memory: 2Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+    startupProbe:
+      # This gives enough time upon container startup before the liveness and readiness probes are triggered.
+      # Giving (120s = initialDelaySeconds + failureThreshold * periodSeconds) to account for the worst case scenario.
+      httpGet:
+        path: /.backstage/health/v1/liveness
+        port: backend
+        scheme: HTTP
+      initialDelaySeconds: 30
+      timeoutSeconds: 4
+      periodSeconds: 20
+      successThreshold: 1
+      failureThreshold: 3
+    readinessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /.backstage/health/v1/readiness
+        port: backend
+        scheme: HTTP
+      # initialDelaySeconds: 30
+      periodSeconds: 10
+      successThreshold: 2
+      timeoutSeconds: 4
+    livenessProbe:
+      failureThreshold: 3
+      httpGet:
+        path: /.backstage/health/v1/liveness
+        port: backend
+        scheme: HTTP
+      # initialDelaySeconds: 60
+      periodSeconds: 10
+      successThreshold: 1
+      timeoutSeconds: 4
     image:
-      # -- image registry (default is Docker Hub)
+      pullPolicy: Always
       registry: docker.io
-      # -- image name
-      repository: veecode/devportal-bundle
-      # -- image tag
-      tag: 0.23.2
-    # -- additional environment variables
-    extraEnvVars:
-      - name: LOG_LEVEL
-        value: debug
-    # workaround para que /app/app-config.yaml e /app/app-config-from-configmap.yaml sejam iguais
+      repository: veecode/devportal
+      tag: latest
+    args:
+      - "--config"
+      - dynamic-plugins-root/app-config.dynamic-plugins.yaml
     extraVolumes:
-    - name: app-config
-      configMap:
-        name: veecode-devportal-upstream-app-config
+      - name: app-config
+        configMap:
+          name: veecode-devportal-app-config
+       #-- Ephemeral volume that will contain the dynamic plugins installed by the initContainer below at start.
+      - name: dynamic-plugins-root
+        emptyDir: {}
+      # Volume that will expose the `dynamic-plugins.yaml` file from the `dynamic-plugins` config map.
+      # The `dynamic-plugins` config map is created by the helm chart from the content of the `global.dynamic` field.
+      - name: dynamic-plugins
+        configMap:
+          defaultMode: 420
+          name: veecode-devportal-dynamic-plugins
+          optional: true
+      - name: npmcacache
+        emptyDir: {}
+      - name: temp
+        emptyDir: {}
     extraVolumeMounts:
-    - name: app-config
-      mountPath: /app/app-config.yaml
-      subPath: app-config.yaml
+      - name: app-config
+        mountPath: /opt/app-root/src/app-config.yaml
+        subPath: app-config.yaml
+      - name: dynamic-plugins-root
+        mountPath: /opt/app-root/src/dynamic-plugins-root
+      - name: temp
+        mountPath: /tmp
+    initContainers:
+      - name: install-dynamic-plugins
+        workingDir: /opt/app-root/src
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 1000m
+            memory: 2.5Gi
+            ephemeral-storage: 5Gi
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          runAsNonRoot: true
+          seccompProfile:
+            type: "RuntimeDefault"
+        image: veecode/devportal:latest
+        imagePullPolicy: Always
+        command: ['./install-dynamic-plugins.sh', '/dynamic-plugins-root'] 
+        env:
+          - name: NPM_CONFIG_USERCONFIG
+            value: /opt/app-root/src/.npmrc.dynamic-plugins
+        volumeMounts:
+          - mountPath: /dynamic-plugins-root
+            name: dynamic-plugins-root
+          - mountPath: /opt/app-root/src/dynamic-plugins.yaml
+            name: dynamic-plugins
+            readOnly: true
+            subPath: dynamic-plugins.yaml
+          - mountPath: /opt/app-root/src/.npm/_cacache
+            name: npmcacache
+          - name: temp
+            mountPath: /tmp
     appConfig:
-      auth: {}
-        # environment: development
-        # providers:
-        #   guest:
-        #     development:
-        #       enabled: true
       app:
-        title: "Veecode DevPortal"
-        # Please update to match host in case you don't want to configure hostname via `global.clusterRouterBase` or `global.host` if not deploying on an openshift cluster.
-        baseUrl: 'https://{{- include "veecode.hostname" . }}'
-        support:
-          url: https://github.com/veecode-platform/support/discussions
-          items:
+        title: Devportal Platform
+        #baseUrl: app frontend base url
+        branding:
+          fullLogo: https://veecode-platform.github.io/support/logos/logo.svg
+          fullLogoDark: https://veecode-platform.github.io/support/logos/logo-black.svg
+          iconLogo: https://veecode-platform.github.io/support/logos/logo-mobile.png
+          theme:
+            light:
+              primaryColor: '#202020'
+              headerColor1: '#45556D'
+              headerColor2: '#86F4CE'
+              navigationIndicatorColor: '#86F4CE'
+            dark:
+              primaryColor: '#cdcdcd'
+              headerColor1: '#45556D'
+              headerColor2: '#86F4CE'
+              navigationIndicatorColor: '#86F4CE'
+        analytics:
+          ga4:
+            measurementId: measurementId
+            identity: optional
+            #testMode: false # Prevents data being sent to GA
+            #debug: true # Logs analytics event to the web console 
+        support: #default veecode support discussions
+          url: https://github.com/veecode-platform/support/discussions 
+          items: 
             - title: Issues
               icon: github
               links:
                 - url: https://github.com/veecode-platform/support/discussions
                   title: GitHub Issues
-        analytics: {}
-      grafana:
-        domain: grafana.localhost
-        unifiedAlerting: true
       backend:
-        baseUrl: 'https://{{- include "veecode.hostname" . }}'
+        auth:
+          externalAccess:
+            - type: static
+              options:
+                token: ayJ7eTbQ6XBrD+xYfbnu+dPT4Z5VdGy #ramdomly generated token, should be replaced with a secure one
+                subject: secret
+        #baseUrl: app backend base url
         listen:
           port: 7007
-        logging:
-          level: debug
+        database:
+          client: better-sqlite3
+          connection: ':memory:'
+          #client: pg
+          #pluginDivisionMode: schema
+          #connection:
+          #  host: host
+          #  port: 5432
+          #  database: database
+          #  user: postgres
+          #  password: password
         cors:
-          origin: 'https://{{- include "veecode.hostname" . }}'
+          #origin: app base url
+          methods: [GET, POST, PUT, DELETE, PATCH]
+          credentials: true
         csp:
-          connect-src: ["'self'", "http:", "https:"]
-          img-src:
-            - "'self'"
-            - "data:"
-            - "https://raw.githubusercontent.com/"
-            - "https://avatars.githubusercontent.com/"
-            - "https://veecode-platform.github.io"
-          script-src:
-            - "'self'"
-            - "'unsafe-eval'"
-            - "https://www.google-analytics.com"
-            - "https://www.googletagmanager.com"
+          connect-src: ["'self'","http:","https:"]
+          img-src: ["'self'","data:","https://raw.githubusercontent.com/","https://avatars.githubusercontent.com/","https://veecode-platform.github.io","https://platform.vee.codes"]
+          script-src: ["'self'","'unsafe-eval'","https://www.google-analytics.com","https://www.googletagmanager.com"]
         reading:
           allow:
             - host: example.com
             - host: "*.mozilla.org"
-        database:
-          client: better-sqlite3
-          connection: ':memory:'
       organization:
-        name: Veecode Platform Devportal
+        #name: organization name
+      permission:
+        enabled: true
+        rbac:
+          pluginsWithPermission:
+            - catalog
+            - scaffolder
+            - permission
+            - kubernetes
+            - vee
+            - kong
+            - veecode-platform-permissions-hub
+          admin:
+            superUsers:
+              - name: user:default/admin
+            users:
+              - name: group:default/admin
       techdocs:
         builder: "local"
         generator:
           runIn: "local"
         publisher:
-          type: "local"
-      integrations: {}
-      scaffolder:
-        defaultAuthor:
-          name: "Scaffolder"
-          email: "scaffolder@vee.codes"
-        defaultCommitMessage: "initial project commit"
+          type: "local"                    
       catalog:
         orphanStrategy: "delete"
         rules:
-          - allow:
-              - "Component"
-              - "API"
-              - "Location"
-              - "Cluster"
-              - "Template"
-              - "Environment"
-              - "Database"
-              - "Vault"
-              - "Infracost"
-              - "Group"
-              - "User"
-        providers: {}
+          - allow: ["Component","API","Location","Cluster","Template","Group","User","Environment","Vault","Infracost","Vulnerabilities","Database"]
+        providers:
+
+          infracost:
+            default: 
+              schedule:    
+                frequency:
+                  minutes: 60
+                timeout:
+                  minutes: 3
+                initialDelay:
+                  seconds: 1
+      #search: should be enabled using a database
+      #  pg:
+      #    highlightOptions:
+      #      useHighlight: true
+      #      maxWord: 35
+      #      minWord: 15
+      #      shortWord: 3
+      #      highlightAll: false
+      #      maxFragments: 0
+      #      fragmentDelimiter:  ... 
+      #    schedule:        
+      #      frequency: 
+      #        minutes: 3
+      #      timeout: 
+      #        minutes: 5
+      auth:
+        environment: "development"
+        session:
+          secret: ayJ7eTbQ6XBrD+xYfbnu+dPT4Z5VdGy #randomly generated secret, should be replaced with a secure one
+        providers:
+          oidc: #should be completed
+
+          github: #should be completed
+
       enabledPlugins:
-        rbac: false
+        rbac: true
         vault: false
         grafana: false
         kubernetes: false
@@ -124,11 +438,10 @@ upstream:
         vee: false
         sonarqube: false
         gitlab: false
-        github: false
-      permission:
-        enabled: false
+        github: true
       platform:
-        signInProviders: {}
+        signInProviders:
+          - "github"
         guest:
           enabled: false
           demo: false
@@ -138,10 +451,10 @@ upstream:
         defaultGroup:
           enabled: false
         group:
-          admin: platform-admin
-          user: platform-user
-        behaviour:
+          admin: default-admin-group
+          user: default-user-group
+        behaviour: 
           mode: "product"
         logo:
-          icon: https://veecode-platform.github.io/support/logos/logo-mobile.png
-          full: https://veecode-platform.github.io/support/logos/logo.svg
+          icon: https://platform.vee.codes/apple-touch-icon.png
+          full: https://platform.vee.codes/assets/logo/logo.png

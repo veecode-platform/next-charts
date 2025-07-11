@@ -37,6 +37,7 @@ upstream:
                   - resolver: emailMatchingUserEntityProfileEmail
                   - resolver: emailLocalPartMatchingUserEntityName
       app:
+        baseUrl: http://devportal.localhost
         analytics:
           ga4:
             measurementId: ${GA_ANALYTICS_ID}
@@ -44,6 +45,7 @@ upstream:
             testMode: false
             debug: true
       backend:
+        baseUrl: http://devportal.localhost
         auth:
           externalAccess:
             - type: static
@@ -97,4 +99,7 @@ upstream:
                 clientSecret: ${GITHUB_CLIENT_SECRET}
                 privateKey: ${GITHUB_PRIVATE_KEY}
                 webhookSecret: ${GITHUB_WEBHOOK_SECRET}
+      grafana:
+        domain: grafana.localhost
+        unifiedAlerting: true
 

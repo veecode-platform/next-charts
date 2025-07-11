@@ -165,7 +165,6 @@ global:
                           - isKind: Cluster
 
                           - isGithubPullRequestsAvailable
-
 upstream:
   fullnameOverride: veecode-devportal
   podSecurityContext:
@@ -174,6 +173,8 @@ upstream:
     fsGroup: 1001
     fsGroupChangePolicy: "OnRootMismatch"
   postgresql:
+    enabled: false
+  diagnosticMode: 
     enabled: false
   backstage:
     replicas: 1
@@ -230,9 +231,9 @@ upstream:
       registry: docker.io
       repository: veecode/devportal
       tag: latest
-    args:
+    args: 
       - "--config"
-      - dynamic-plugins-root/app-config.dynamic-plugins.yaml
+      - dynamic-plugins-root/app-config.dynamic-plugins.yaml      
     extraVolumes:
       - name: app-config
         configMap:
@@ -295,10 +296,10 @@ upstream:
             name: npmcacache
           - name: temp
             mountPath: /tmp
+    installDir: /opt/app-root/src
     appConfig:
       app:
         title: Devportal Platform
-        #baseUrl: app frontend base url
         branding:
           fullLogo: https://veecode-platform.github.io/support/logos/logo.svg
           fullLogoDark: https://veecode-platform.github.io/support/logos/logo-black.svg
@@ -314,12 +315,6 @@ upstream:
               headerColor1: '#45556D'
               headerColor2: '#86F4CE'
               navigationIndicatorColor: '#86F4CE'
-        analytics:
-          ga4:
-            measurementId: measurementId
-            identity: optional
-            #testMode: false # Prevents data being sent to GA
-            #debug: true # Logs analytics event to the web console 
         support: #default veecode support discussions
           url: https://github.com/veecode-platform/support/discussions 
           items: 
@@ -329,13 +324,6 @@ upstream:
                 - url: https://github.com/veecode-platform/support/discussions
                   title: GitHub Issues
       backend:
-        auth:
-          externalAccess:
-            - type: static
-              options:
-                token: ayJ7eTbQ6XBrD+xYfbnu+dPT4Z5VdGy #ramdomly generated token, should be replaced with a secure one
-                subject: secret
-        #baseUrl: app backend base url
         listen:
           port: 7007
         database:
@@ -362,7 +350,7 @@ upstream:
             - host: example.com
             - host: "*.mozilla.org"
       organization:
-        #name: organization name
+        name: veecode
       permission:
         enabled: true
         rbac:
@@ -390,7 +378,6 @@ upstream:
         rules:
           - allow: ["Component","API","Location","Cluster","Template","Group","User","Environment","Vault","Infracost","Vulnerabilities","Database"]
         providers:
-
           infracost:
             default: 
               schedule:    
@@ -415,15 +402,6 @@ upstream:
       #        minutes: 3
       #      timeout: 
       #        minutes: 5
-      auth:
-        environment: "development"
-        session:
-          secret: ayJ7eTbQ6XBrD+xYfbnu+dPT4Z5VdGy #randomly generated secret, should be replaced with a secure one
-        providers:
-          oidc: #should be completed
-
-          github: #should be completed
-
       enabledPlugins:
         rbac: true
         vault: false

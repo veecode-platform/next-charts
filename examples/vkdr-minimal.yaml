@@ -15,6 +15,27 @@
 #
 global:
   host: devportal.localhost
+  dynamic:
+    plugins:
+      # VeeCode Homepage
+      - package: '@veecode-platform/plugin-veecode-homepage-dynamic@0.1.9'
+        disabled: false
+        integrity: sha512-MFv33GyxK+0/BqnAKPvZjC8Iw9V6fgFdUwcTGlFiSZElRM/4ncf9LVc2wo+aC5h0kO2svIuQeXVjP5q2jPlUhg==
+      # Github Workflows
+      - package: '@veecode-platform/backstage-plugin-github-workflows-dynamic@0.1.0'
+        disabled: true
+      # Gitlab Pipelines
+      - package: '@veecode-platform/backstage-plugin-gitlab-pipelines-dynamic@0.1.0'
+        disabled: true
+      # Infracost
+      - package: '@veecode-platform/backstage-plugin-infracost-dynamic@0.1.0'
+        disabled: true
+      # Kubernetes GPT Analyzer
+      - package: '@veecode-platform/backstage-plugin-kubernetes-gpt-analyzer-dynamic@0.1.0'
+        disabled: true
+      # Zora OSS
+      - package: '@veecode-platform/backstage-plugin-zora-oss-dynamic@0.1.0'
+        disabled: true
 upstream:
   enabled: true
   fullnameOverride: veecode-devportal
@@ -97,7 +118,8 @@ upstream:
               - appId: ${GITHUB_APP_ID}
                 clientId: ${GITHUB_CLIENT_ID}
                 clientSecret: ${GITHUB_CLIENT_SECRET}
-                privateKey: ${GITHUB_PRIVATE_KEY}
+                privateKey: |
+                  ${GITHUB_PRIVATE_KEY}
                 webhookSecret: ${GITHUB_WEBHOOK_SECRET}
       grafana:
         domain: grafana.localhost

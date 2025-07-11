@@ -2,6 +2,20 @@
 
 Next generation VeeCode Helm Charts
 
+## Secrets
+
+```bash
+kubectl create secret generic my-backstage-secrets \
+  --from-literal=BACKEND_AUTH_SECRET_KEY=${BACKEND_AUTH_SECRET_KEY} \
+  --from-literal=GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID} \
+  --from-literal=GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET} \
+  --from-literal=GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY} \
+  --from-literal=GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET} \
+  --from-literal=GITHUB_APP_ID=${GITHUB_APP_ID} \
+  --from-literal=GITHUB_TOKEN=${GITHUB_TOKEN} \
+  --from-literal=GA_ANALYTICS_ID=${GA_ANALYTICS_ID}
+```
+
 ## Development
 
 Download chart dependencies:

@@ -10,3 +10,14 @@ Returns custom hostname
         {{ fail "Unable to generate hostname (global.host is not set)" }}
     {{- end -}}
 {{- end -}}
+
+{{/*
+Returns custom protocol
+*/}}
+{{- define "veecode.protocol" -}}
+    {{- if .Values.global.protocol -}}
+        {{- .Values.global.protocol -}}
+    {{- else -}}
+        https
+    {{- end -}}
+{{- end -}}

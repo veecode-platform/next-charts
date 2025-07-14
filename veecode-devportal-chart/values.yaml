@@ -1,4 +1,6 @@
 global:
+  # host: devportal.localhost
+  protocol: http
   dynamic:
     plugins:
       # VeeCode Homepage
@@ -299,7 +301,8 @@ upstream:
     installDir: /opt/app-root/src
     appConfig:
       app:
-        title: Devportal Platform
+        title: "Devportal Platform"
+        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
         branding:
           fullLogo: https://veecode-platform.github.io/support/logos/logo.svg
           fullLogoDark: https://veecode-platform.github.io/support/logos/logo-black.svg
@@ -324,6 +327,7 @@ upstream:
                 - url: https://github.com/veecode-platform/support/discussions
                   title: GitHub Issues
       backend:
+        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
         listen:
           port: 7007
         database:
@@ -339,6 +343,7 @@ upstream:
           #  password: password
         cors:
           #origin: app base url
+          baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
           methods: [GET, POST, PUT, DELETE, PATCH]
           credentials: true
         csp:

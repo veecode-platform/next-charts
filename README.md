@@ -5,6 +5,7 @@ Next generation VeeCode Helm Charts
 ## Secrets
 
 ```bash
+# idempotent command
 kubectl create secret generic my-backstage-secrets \
   --from-literal=BACKEND_AUTH_SECRET_KEY=${BACKEND_AUTH_SECRET_KEY} \
   --from-literal=GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID} \
@@ -13,7 +14,8 @@ kubectl create secret generic my-backstage-secrets \
   --from-literal=GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET} \
   --from-literal=GITHUB_APP_ID=${GITHUB_APP_ID} \
   --from-literal=GITHUB_TOKEN=${GITHUB_TOKEN} \
-  --from-literal=GA_ANALYTICS_ID=${GA_ANALYTICS_ID}
+  --from-literal=GA_ANALYTICS_ID=${GA_ANALYTICS_ID} \
+  --dry-run=client --save-config -o yaml | kubectl apply -f -
 ```
 
 ## Development
@@ -42,8 +44,8 @@ helm upgrade --install veecode-devportal ./veecode-devportal-chart \
 Dump generated app-config:
 
 ```bash
-POD=$(kubectl get pods | grep "^veecode-devportal-upstream" | awk '{print $1}')
-kubectl exec -it $POD -- cat /app/app-config-from-configmap.yaml
+POD=$(kubectl get pods | grep "^veecode-devportal-" | awk '{print $1}')
+kubectl exec -it $POD -- cat /opt/app-root/src/app-config.yaml | yq
 ```
 
 ## Generate chart README.md

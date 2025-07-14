@@ -1,6 +1,7 @@
 global:
+  # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
   # host: devportal.localhost
-  protocol: http
+  # protocol: http
   dynamic:
     plugins:
       # VeeCode Homepage
@@ -165,15 +166,20 @@ global:
                         allOf|anyOf|oneOf:
                           - isZoraAvailable
                           - isKind: Cluster
-
                           - isGithubPullRequestsAvailable
+createClusterRoles:
+  enabled: true
 upstream:
+  enabled: true
   fullnameOverride: veecode-devportal
   podSecurityContext:
     runAsUser: 1001
     runAsGroup: 1001
     fsGroup: 1001
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    create: true
+    name: veecode-devportal-sa
   postgresql:
     enabled: false
   diagnosticMode: 

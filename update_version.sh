@@ -7,7 +7,7 @@ set -e
 CHART_DIR="veecode-devportal-chart"
 VALUES_FILE="$CHART_DIR/values.yaml"
 CHART_FILE="$CHART_DIR/Chart.yaml"
-IMAGE_REPO="veecode/devportal-bundle"
+IMAGE_REPO="veecode/devportal"
 
 if [ -n "$1" ]; then
   NEW_TAG="$1"

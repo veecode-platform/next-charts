@@ -238,7 +238,7 @@ upstream:
       pullPolicy: Always
       registry: docker.io
       repository: veecode/devportal
-      tag: latest
+      tag: 1.0.10
     args: 
       - "--config"
       - dynamic-plugins-root/app-config.dynamic-plugins.yaml      

@@ -172,11 +172,6 @@ createClusterRoles:
 upstream:
   enabled: true
   fullnameOverride: veecode-devportal
-  podSecurityContext:
-    runAsUser: 1001
-    runAsGroup: 1001
-    fsGroup: 1001
-    fsGroupChangePolicy: "OnRootMismatch"
   serviceAccount:
     create: true
     name: veecode-devportal-sa
@@ -187,6 +182,11 @@ upstream:
   backstage:
     replicas: 1
     command: []
+    podSecurityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+      fsGroupChangePolicy: "OnRootMismatch"
     containerSecurityContext:
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false

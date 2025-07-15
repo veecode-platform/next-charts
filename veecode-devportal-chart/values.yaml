@@ -19,9 +19,22 @@ global:
                       props:
                         width: 1500
                         height: 800
+      # VeeCode GlobalHeader
+      - package: '@veecode-platform/plugin-veecode-global-header-dynamic@0.1.4'
+        disabled: false
+        integrity: sha512-ldP0qC8Jd8AIC8DRnEuT1oQq6ELUxlm90gRAaUl3TEVoenrs8Wwxyb8TqgTiZNO5akhcA8tBMHDAugUYS9+yMg==
+        pluginConfig:
+          dynamicPlugins:
+            frontend:
+              veecode-platform.plugin-veecode-global-header:
+                mountPoints:
+                  - mountPoint: application/header
+                    inportName: VeecodeGlobalHeader
+                    config:
+                      position: above-sidebar
       # Github Workflows
       - package: '@veecode-platform/backstage-plugin-github-workflows-dynamic@0.1.0'
-        disabled: false
+        disabled: true
         integrity: sha512-gdCO5aSVNs2gwAU6bx17Bdt34G5xtb8EXCoCDIeKTlG7/vIB8xzCIxPIiNVLWkAp6v8lw+kdnF25/3GceOhskQ==
         pluginConfig:
           dynamicPlugins:
@@ -49,7 +62,7 @@ global:
                           - isGithubAvailable
       # Gitlab Pipelines
       - package: '@veecode-platform/backstage-plugin-gitlab-pipelines-dynamic@0.1.0'
-        disabled: false
+        disabled: true
         integrity: sha512-IPIfKbdShbUng8S9QygPWx9wmn7hbw1W6iAXZ4xZC9REN05IZWedWjawp1iipXfMG3oA9c3L4qAC7ztMftbEfQ==
         pluginConfig:
           dynamicPlugins:
@@ -77,7 +90,7 @@ global:
                           - isGitlabAvailable
       # Infracost
       - package: '@veecode-platform/backstage-plugin-infracost-dynamic@0.1.0'
-        disabled: false
+        disabled: true
         integrity: sha512-zGOe18uSIYBApBigXu1T4LjEvfGOvr/W1fBAzdvMJE1q3QNOrpMi/bPXalSIQuS6KiWyX6ps/JF9IAcpZSbCNA==
         pluginConfig:
           dynamicPlugins:
@@ -96,7 +109,7 @@ global:
                           - isInfracostAvailable
       # Kubernetes GPT Analyzer
       - package: '@veecode-platform/backstage-plugin-kubernetes-gpt-analyzer-dynamic@0.1.0'
-        disabled: false
+        disabled: true
         integrity: sha512-ZajRQmYkYcP7MJYva0PISqTqJ8+UDXJL2hxIAgYhprOPMzEqXMtze+/wvPAjcgl/nOuNt+Q+ZQNFRDqZ2BCQUg==
         pluginConfig:
           dynamicPlugins:
@@ -127,7 +140,7 @@ global:
                           - isKubernetesAvailable
       # Zora OSS
       - package: '@veecode-platform/backstage-plugin-zora-oss-dynamic@0.1.0'
-        disabled: false
+        disabled: true
         integrity: sha512-wayuoYWaOqp9neoRePEzo/qbBMKR3vBta/meOGdJ8+p6Ze4KjYWgXKjkKzsxSdmg2uYpDwgrAv/+gedmweJ9Xw==
         pluginConfig:
           dynamicPlugins:
@@ -238,7 +251,7 @@ upstream:
       pullPolicy: Always
       registry: docker.io
       repository: veecode/devportal
-      tag: 1.0.10
+      tag: 1.0.11
     args: 
       - "--config"
       - dynamic-plugins-root/app-config.dynamic-plugins.yaml      
@@ -287,7 +300,7 @@ upstream:
           runAsNonRoot: true
           seccompProfile:
             type: "RuntimeDefault"
-        image: veecode/devportal:1.0.10
+        image: veecode/devportal:1.0.11
         imagePullPolicy: Always
         command: ['./install-dynamic-plugins.sh', '/dynamic-plugins-root'] 
         env:

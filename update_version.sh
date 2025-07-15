@@ -35,9 +35,11 @@ if [ "$NEW_TAG" = "$CURRENT_TAG" ] && [ "$NEW_TAG" = "$CURRENT_APP_VERSION" ]; t
 else
   echo "Updating to version: $NEW_TAG"
   # Update values.yaml (image tag)
-  sed -i '' "s/^\([[:space:]]*tag: \).*/\1$NEW_TAG/" "$VALUES_FILE"
+  #sed -i '' "s/^\([[:space:]]*tag: \).*/\1$NEW_TAG/" "$VALUES_FILE"
+  sed -i.bak "s/^\([[:space:]]*tag: \).*/\1$NEW_TAG/" "$VALUES_FILE" && rm "$VALUES_FILE.bak"
   # Update Chart.yaml (appVersion)
-  sed -i '' "s/^appVersion: .*/appVersion: \"$NEW_TAG\"/" "$CHART_FILE"
+  #sed -i '' "s/^appVersion: .*/appVersion: \"$NEW_TAG\"/" "$CHART_FILE"
+  sed -i.bak "s/^appVersion: .*/appVersion: \"$NEW_TAG\"/" "$CHART_FILE" && rm "$CHART_FILE.bak"
 fi
 
 # Increment Chart.yaml version (patch)
@@ -47,7 +49,8 @@ if [[ $CHART_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
   PATCH="${BASH_REMATCH[3]}"
   NEW_PATCH=$((PATCH+1))
   NEW_CHART_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
-  sed -i '' "s/^version: .*/version: $NEW_CHART_VERSION/" "$CHART_FILE"
+  #sed -i '' "s/^version: .*/version: $NEW_CHART_VERSION/" "$CHART_FILE"
+  sed -i.bak "s/^version: .*/version: $NEW_CHART_VERSION/" "$CHART_FILE" && rm "$CHART_FILE.bak"
   echo "Chart.yaml version bumped to $NEW_CHART_VERSION"
 else
   echo "Warning: Chart version $CHART_VERSION is not in semver format, not incremented and aborting."

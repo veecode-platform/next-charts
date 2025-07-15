@@ -287,7 +287,7 @@ upstream:
           runAsNonRoot: true
           seccompProfile:
             type: "RuntimeDefault"
-        image: veecode/devportal:latest
+        image: veecode/devportal:1.0.10
         imagePullPolicy: Always
         command: ['./install-dynamic-plugins.sh', '/dynamic-plugins-root'] 
         env:
@@ -363,7 +363,7 @@ upstream:
       organization:
         name: veecode
       permission:
-        enabled: true
+        enabled: false
         rbac:
           pluginsWithPermission:
             - catalog
@@ -414,7 +414,7 @@ upstream:
       #      timeout: 
       #        minutes: 5
       enabledPlugins:
-        rbac: true
+        rbac: false
         vault: false
         grafana: false
         kubernetes: false

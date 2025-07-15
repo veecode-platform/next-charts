@@ -61,6 +61,8 @@ upstream:
         session:
           secret: "${BACKEND_AUTH_SECRET_KEY}"
         providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true
           github:
             development:
               clientId: ${GITHUB_CLIENT_ID}
@@ -97,6 +99,9 @@ upstream:
       platform:
         signInProviders:
           - github
+        guest:
+          enabled: true
+          demo: false
       catalog:
         providers:
           githubOrg:

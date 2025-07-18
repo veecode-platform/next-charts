@@ -2,6 +2,22 @@
 
 Next generation VeeCode Helm Charts
 
+## Development
+
+Download chart dependencies:
+
+```bash
+cd veecode-devportal-chart
+helm dependency update
+```
+
+Start local cluster:
+
+```bash
+vkdr infra start --http 80 --https 443
+vkdr nginx install --default-ic
+```
+
 ## Secrets
 
 ```bash
@@ -18,21 +34,7 @@ kubectl create secret generic my-backstage-secrets \
   --dry-run=client --save-config -o yaml | kubectl apply -f -
 ```
 
-## Development
-
-Download chart dependencies:
-
-```bash
-cd veecode-devportal-chart
-helm dependency update
-```
-
-Start local cluster:
-
-```bash
-vkdr infra start --http 80 --https 443
-vkdr nginx install --default-ic
-```
+## Deployment
 
 Deploy locally:
 

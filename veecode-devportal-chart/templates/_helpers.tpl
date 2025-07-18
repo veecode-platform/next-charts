@@ -21,3 +21,25 @@ Returns custom protocol
         https
     {{- end -}}
 {{- end -}}
+
+{{/*
+Returns chosen image
+*/}}
+{{- define "veecode.image" -}}
+    {{- if .Values.backstage.image.repository -}}
+        {{- .Values.backstage.image.repository -}}
+    {{- else -}}
+        {{ fail "Backstage image repository is not set" }}
+    {{- end -}}
+{{- end -}}
+
+{{/*
+Returns chosen tag
+*/}}
+{{- define "veecode.tag" -}}
+    {{- if .Values.backstage.image.tag -}}
+        {{- .Values.backstage.image.tag -}}
+    {{- else -}}
+        {{ fail "Backstage image tag is not set" }}
+    {{- end -}}
+{{- end -}}

@@ -2,8 +2,38 @@ apiVersion: v1
 entries:
   veecode-devportal:
   - apiVersion: v2
+    appVersion: 1.0.13
+    created: "2025-07-18T19:01:43.604906-03:00"
+    dependencies:
+    - alias: upstream
+      name: backstage
+      repository: https://backstage.github.io/charts
+      version: 2.5.2
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      version: ~2.x.x
+    description: Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage
+      chart
+    digest: 0bd809551722954176a58b23d32f0806b53ceeed68dc7914eb987dd953216045
+    home: https://platform.vee.codes/
+    icon: https://platform.vee.codes/android-chrome-512x512.png
+    keywords:
+    - veecode
+    - platform
+    - devportal
+    - backstage
+    - api management
+    - idp
+    name: veecode-devportal
+    sources:
+    - https://github.com/veecode-platform/next-charts
+    type: application
+    urls:
+    - https://veecode-platform.github.io/next-charts/veecode-devportal-1.0.6.tgz
+    version: 1.0.6
+  - apiVersion: v2
     appVersion: 1.0.11
-    created: "2025-07-15T12:57:36.200206554-03:00"
+    created: "2025-07-18T19:01:43.599946-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -33,7 +63,7 @@ entries:
     version: 1.0.5
   - apiVersion: v2
     appVersion: 1.0.10
-    created: "2025-07-15T12:57:36.190982969-03:00"
+    created: "2025-07-18T19:01:43.594281-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -63,7 +93,7 @@ entries:
     version: 1.0.4
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2025-07-15T12:57:36.180738174-03:00"
+    created: "2025-07-18T19:01:43.588768-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -93,7 +123,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2025-07-15T12:57:36.168814251-03:00"
+    created: "2025-07-18T19:01:43.583671-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -109,7 +139,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2025-07-15T12:57:36.158424749-03:00"
+    created: "2025-07-18T19:01:43.578613-03:00"
     dependencies:
     - alias: upstream
       name: backstage
@@ -123,4 +153,4 @@ entries:
     urls:
     - https://veecode-platform.github.io/next-charts/veecode-devportal-1.0.1.tgz
     version: 1.0.1
-generated: "2025-07-15T12:57:36.149384582-03:00"
+generated: "2025-07-18T19:01:43.573221-03:00"

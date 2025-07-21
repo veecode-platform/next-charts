@@ -74,5 +74,5 @@ subjects:
 subjects:
   - kind: ServiceAccount
     name: {{ .Values.upstream.serviceAccount.name }}
-    namespace: default
+    namespace: {{ .Release.Namespace }}
 {{- end }}

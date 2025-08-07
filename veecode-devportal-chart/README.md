@@ -10,7 +10,7 @@ This is VeeCode DevPortal new Helm Chart, wrapping the official Backstage chart.
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://backstage.github.io/charts | upstream(backstage) | 2.5.2 |
+| https://backstage.github.io/charts | upstream(backstage) | 2.6.0 |
 
 ## Values
 

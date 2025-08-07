@@ -15,6 +15,7 @@
 #
 global:
   host: devportal.localhost
+  protocol: http
 upstream:
   enabled: true
   fullnameOverride: veecode-devportal

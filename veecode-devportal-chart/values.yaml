@@ -269,6 +269,20 @@ upstream:
           defaultMode: 420
           name: veecode-devportal-dynamic-plugins
           optional: true
+      # Optional volume that allows exposing the `.npmrc` file (through a `dynamic-plugins-npmrc` secret)
+      # to be used when running `npm pack` during the dynamic plugins installation by the initContainer.
+      - name: dynamic-plugins-npmrc
+        secret:
+          defaultMode: 420
+          optional: true
+          secretName: '{{ printf "%s-dynamic-plugins-npmrc" .Release.Name }}'
+      # Optional volume that allows adding a container registry `auth.json` file (through a `dynamic-plugins-registry-auth` secret)
+      # to be used when installing plugins from secure container registries during the dynamic plugins installation by the initContainer.
+      - name: dynamic-plugins-registry-auth
+        secret:
+          defaultMode: 416
+          optional: true
+          secretName: '{{ printf "%s-dynamic-plugins-registry-auth" .Release.Name }}'
       - name: npmcacache
         emptyDir: {}
       - name: temp
@@ -313,6 +327,15 @@ upstream:
             name: dynamic-plugins
             readOnly: true
             subPath: dynamic-plugins.yaml
+          # Optional mount of the `.npmrc` file to be used when installing dynamic plugins.
+          # This allows using private npm registries when installing dynamic plugins.
+          - mountPath: /opt/app-root/src/.npmrc.dynamic-plugins
+            name: dynamic-plugins-npmrc
+            readOnly: true
+            subPath: .npmrc
+          - mountPath: /opt/app-root/src/.config/containers
+            name: dynamic-plugins-registry-auth
+            readOnly: true
           - mountPath: /opt/app-root/src/.npm/_cacache
             name: npmcacache
           - name: temp

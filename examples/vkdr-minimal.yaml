@@ -42,7 +42,6 @@ upstream:
                   - resolver: emailMatchingUserEntityProfileEmail
                   - resolver: emailLocalPartMatchingUserEntityName
       app:
-        baseUrl: http://devportal.localhost
         analytics:
           ga4:
             measurementId: ${GA_ANALYTICS_ID}
@@ -50,7 +49,6 @@ upstream:
             testMode: false
             debug: true
       backend:
-        baseUrl: http://devportal.localhost
         auth:
           externalAccess:
             - type: static
@@ -62,15 +60,9 @@ upstream:
           github:
             - host: "github.com"
               token: ${GITHUB_TOKEN}
-      enabledPlugins:
-        github: true
-        kubernetes: true
       platform:
-        signInProviders:
-          - github
         guest:
           enabled: true
-          demo: false
       catalog:
         providers:
           githubOrg:

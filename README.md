@@ -14,23 +14,19 @@ helm dependency update
 Start local cluster:
 
 ```bash
-vkdr infra start --http 80 --https 443
+vkdr infra up # port 8000
 vkdr nginx install --default-ic
 ```
 
 ## Secrets
 
+Use a PAT from GitHub to authenticate with GitHub (permissions: "repo:full, workflow"):
+
 ```bash
 # idempotent command
 kubectl create secret generic my-backstage-secrets \
-  --from-literal=BACKEND_AUTH_SECRET_KEY=${BACKEND_AUTH_SECRET_KEY} \
-  --from-literal=GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID} \
-  --from-literal=GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET} \
-  --from-literal=GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY} \
-  --from-literal=GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET} \
-  --from-literal=GITHUB_APP_ID=${GITHUB_APP_ID} \
+  --from-literal=BACKEND_AUTH_SECRET_KEY=somethingrandom \
   --from-literal=GITHUB_TOKEN=${GITHUB_TOKEN} \
-  --from-literal=GA_ANALYTICS_ID=${GA_ANALYTICS_ID} \
   --dry-run=client --save-config -o yaml | kubectl apply -f -
 ```
 

@@ -23,6 +23,17 @@ Returns custom protocol
 {{- end -}}
 
 {{/*
+Returns custom port
+*/}}
+{{- define "veecode.port" -}}
+    {{- if .Values.global.port -}}
+        {{- .Values.global.port -}}
+    {{- else -}}
+        
+    {{- end -}}
+{{- end -}}
+
+{{/*
 Returns chosen image
 */}}
 {{- define "veecode.image" -}}

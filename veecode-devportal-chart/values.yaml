@@ -2,6 +2,7 @@ global:
   # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
   host: devportal.localhost
   protocol: https
+  port: ''
   dynamic:
     plugins:
       # VeeCode Homepage
@@ -188,6 +189,9 @@ upstream:
   serviceAccount:
     create: true
     name: veecode-devportal-sa
+  ingress:
+    enabled: false
+    host: '{{- include "veecode.hostname" . }}'
   postgresql:
     enabled: false
   diagnosticMode: 
@@ -344,7 +348,7 @@ upstream:
     appConfig:
       app:
         title: "Devportal Platform"
-        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
+        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}{{- include "veecode.port" . }}'
         branding:
           fullLogo: https://veecode-platform.github.io/support/logos/logo.svg
           fullLogoDark: https://veecode-platform.github.io/support/logos/logo-black.svg
@@ -369,7 +373,7 @@ upstream:
                 - url: https://github.com/veecode-platform/support/discussions
                   title: GitHub Issues
       backend:
-        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
+        baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}{{- include "veecode.port" . }}'
         listen:
           port: 7007
         database:
@@ -385,7 +389,7 @@ upstream:
           #  password: password
         cors:
           #origin: app base url
-          baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}'
+          baseUrl: '{{- include "veecode.protocol" . }}://{{- include "veecode.hostname" . }}{{- include "veecode.port" . }}'
           methods: [GET, POST, PUT, DELETE, PATCH]
           credentials: true
         csp:

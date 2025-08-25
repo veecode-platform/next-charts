@@ -1,21 +1,23 @@
 #
 # setup minimo infra local (vkdr):
 #
-# vkdr infra start --http 80 --https 443
+# vkdr infra up
 # vkdr nginx install --default-ic
 #
 # exemplo de secret para testes:
 #
 # kubectl create secret generic my-backstage-secrets \
-#   --from-literal=BACKEND_AUTH_SECRET_KEY=66459a4032ff4702a39175bcf1f9a3b4
+#   --from-literal=GITHUB_TOKEN=${GITHUB_TOKEN} \
+#   --from-literal=BACKEND_AUTH_SECRET_KEY=somethingrandom
 #
 # instalação local:
 #
 # helm upgrade --install veecode-devportal ./veecode-devportal-chart -f examples/vkdr-minimal.yaml
 #
 global:
-  host: devportal.localhost
+  host: localhost
   protocol: http
+  port: '8000' # need quotes
 upstream:
   enabled: true
   fullnameOverride: veecode-devportal
@@ -32,19 +34,20 @@ upstream:
         providers:
           guest:
             dangerouslyAllowOutsideDevelopment: true
-          github:
-            development:
-              clientId: ${GITHUB_CLIENT_ID}
-              clientSecret: ${GITHUB_CLIENT_SECRET}
-              signIn:
-                resolvers:
-                  - resolver: usernameMatchingUserEntityName
-                  - resolver: emailMatchingUserEntityProfileEmail
-                  - resolver: emailLocalPartMatchingUserEntityName
+          # github:
+          #   development:
+          #     clientId: ${GITHUB_CLIENT_ID}
+          #     clientSecret: ${GITHUB_CLIENT_SECRET}
+          #     signIn:
+          #       resolvers:
+          #         - resolver: usernameMatchingUserEntityName
+          #         - resolver: emailMatchingUserEntityProfileEmail
+          #         - resolver: emailLocalPartMatchingUserEntityName
       app:
         analytics:
           ga4:
-            measurementId: ${GA_ANALYTICS_ID}
+            measurementId: something
+            #measurementId: ${GA_ANALYTICS_ID}
             identity: optional
             testMode: false
             debug: true
@@ -64,43 +67,44 @@ upstream:
         guest:
           enabled: true
       catalog:
-        providers:
-          githubOrg:
-            id: providerId
-            githubUrl: https://github.com
-            orgs:
-              - "veecode-saas-tenants"
-            schedule:
-              frequency:
-                minutes: 20
-              timeout:
-                minutes: 3
-          github:
-            providerId:
-              organization: "veecode-saas-tenants"
-              catalogPath: "/catalog-info.yaml"
-              validateLocationsExist: true
-              filters:
-                branch: "main"
-                repository: "tenants-catalog"
-              schedule:
-                frequency:
-                  minutes: 20
-                timeout:
-                  minutes: 3
+        # providers:
+        #   githubOrg:
+        #     id: providerId
+        #     githubUrl: https://github.com
+        #     orgs:
+        #       - "veecode-saas-tenants"
+        #     schedule:
+        #       frequency:
+        #         minutes: 20
+        #       timeout:
+        #         minutes: 3
+        #   github:
+        #     providerId:
+        #       organization: "veecode-saas-tenants"
+        #       catalogPath: "/catalog-info.yaml"
+        #       validateLocationsExist: true
+        #       filters:
+        #         branch: "main"
+        #         repository: "tenants-catalog"
+        #       schedule:
+        #         frequency:
+        #           minutes: 20
+        #         timeout:
+        #           minutes: 3
         locations:
           - type: url
             target: https://github.com/veecode-saas-tenants/tenants-catalog/blob/main/catalog-info.yaml
       integrations:
         github:
           - host: "github.com"
-            apps:
-              - appId: ${GITHUB_APP_ID}
-                clientId: ${GITHUB_CLIENT_ID}
-                clientSecret: ${GITHUB_CLIENT_SECRET}
-                privateKey: |
-                  ${GITHUB_PRIVATE_KEY}
-                webhookSecret: ${GITHUB_WEBHOOK_SECRET}
+            token: ${GITHUB_TOKEN}
+            # apps:
+            #   - appId: ${GITHUB_APP_ID}
+            #     clientId: ${GITHUB_CLIENT_ID}
+            #     clientSecret: ${GITHUB_CLIENT_SECRET}
+            #     privateKey: |
+            #       ${GITHUB_PRIVATE_KEY}
+            #     webhookSecret: ${GITHUB_WEBHOOK_SECRET}
       grafana:
         domain: grafana.localhost
         unifiedAlerting: true

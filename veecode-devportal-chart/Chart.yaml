@@ -3,7 +3,7 @@ name: veecode-devportal
 description: Parent Helm Chart for VeeCode DevPortal, wrapping the official Backstage chart
 type: application
 version: 1.0.13
-appVersion: "1.0.16"
+appVersion: "1.0.17"
 home: https://platform.vee.codes/
 icon: https://platform.vee.codes/android-chrome-512x512.png
 sources: ["https://github.com/veecode-platform/next-charts"]

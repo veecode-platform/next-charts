@@ -17,7 +17,7 @@
 global:
   host: localhost
   protocol: http
-  port: '8000' # need quotes
+  port: ':8000' # needs quotes, must start with ':' if not empty
 upstream:
   enabled: true
   fullnameOverride: veecode-devportal

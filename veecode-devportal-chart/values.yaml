@@ -1,8 +1,23 @@
 global:
-  # -- The external hostname for your DevPortal instance (e.g. https://myportal.apps.vee.codes)
+  # define external hostname
   host: devportal.localhost
+  # define protocol (http or https)
   protocol: https
+  # define port (leave empty for default, must start with ":" if not empty)
   port: ''
+  # custom theme settings
+  theme:
+    # Theme file url (should be a valid url to a json file)
+    downloadUrl: ""
+    # custom theme json (may merge or replace)
+    # customJson: |
+    #   {
+    #     "nop": "nop"
+    #   }
+    # Merge customJson with default theme ("false" will replace default theme)
+    mergeJson: true
+    # define favIcon url
+    favIcon: ''
   dynamic:
     plugins:
       # VeeCode Homepage
@@ -198,13 +213,23 @@ upstream:
     enabled: false
   backstage:
     replicas: 1
-    command: []
+    command: ["/opt/entrypoint.sh"]
+    extraEnvVars:
+      - name: THEME_FAV_ICON
+        value: '{{ .Values.global.theme.favIcon }}'
+      - name: THEME_DOWNLOAD_URL
+        value: '{{ .Values.global.theme.downloadUrl }}'
+      - name: THEME_CUSTOM_JSON
+        value: '{{- if .Values.global.theme.customJson -}}{{ .Values.global.theme.customJson | fromJson | toJson }}{{- end -}}'
+      - name: THEME_MERGE_JSON
+        value: '{{ .Values.global.theme.mergeJson }}'
     podSecurityContext:
       runAsUser: 1001
       runAsGroup: 1001
       fsGroup: 1001
       fsGroupChangePolicy: "OnRootMismatch"
     containerSecurityContext:
+      # readOnlyRootFilesystem=true is more secure, but disables custom theme (will fix this later)
       readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
       capabilities:
@@ -255,7 +280,7 @@ upstream:
       pullPolicy: Always
       registry: docker.io
       repository: veecode/devportal
-      tag: 1.0.16
+      tag: 1.0.17
     args:
       - "--config"
       - dynamic-plugins-root/app-config.dynamic-plugins.yaml      
@@ -263,7 +288,7 @@ upstream:
       - name: app-config
         configMap:
           name: veecode-devportal-app-config
-       #-- Ephemeral volume that will contain the dynamic plugins installed by the initContainer below at start.
+      #-- Ephemeral volume that will contain the dynamic plugins installed by the initContainer below at start.
       - name: dynamic-plugins-root
         emptyDir: {}
       # Volume that will expose the `dynamic-plugins.yaml` file from the `dynamic-plugins` config map.

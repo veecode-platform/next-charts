@@ -9,6 +9,7 @@ all: index
 
 release:
 	./update_version.sh
+	./update_changelog.sh
 	@echo "RELEASE: package + index"
 	$(MAKE) index
 

@@ -61,4 +61,3 @@ Increment version in Chart.yaml and package + index a new release:
 ```bash
 make release
 ```
-

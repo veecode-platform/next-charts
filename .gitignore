@@ -2,3 +2,5 @@
 */charts/*.tgz
 
 setenv.sh
+
+.DS_Store

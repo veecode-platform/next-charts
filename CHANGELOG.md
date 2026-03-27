@@ -2,6 +2,14 @@
 
 All notable changes to the VeeCode DevPortal Helm Chart are documented in this file.
 
+## [2.0.2] - 2026-03-27
+
+- Simplify minimal example and add branding example
+- Upgrade chart to v2.0.1 for DevPortal 1.4.x with new plugin system
+- Add changelog generation script and integrate into release target
+- Add project documentation, changelog, and update gitignore
+
+
 ## [1.0.14] - 2025-03-26
 
 - custom theme under 'global.theme'

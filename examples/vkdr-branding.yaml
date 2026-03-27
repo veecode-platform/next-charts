@@ -1,0 +1,77 @@
+#
+# setup minimo infra local (vkdr):
+#
+# vkdr infra up
+# vkdr nginx install --default-ic
+#
+# exemplo de secret para testes:
+#
+# kubectl create secret generic my-backstage-secrets \
+#   --from-literal=GITHUB_TOKEN=${GITHUB_TOKEN} \
+#   --from-literal=BACKEND_AUTH_SECRET_KEY=somethingrandom
+#
+# instalação local:
+#
+# helm upgrade --install veecode-devportal ./veecode-devportal-chart -f examples/vkdr-minimal.yaml
+#
+global:
+  host: localhost
+  protocol: http
+  port: ':8000' # needs quotes, must start with ':' if not empty
+upstream:
+  enabled: true
+  fullnameOverride: veecode-devportal
+  ingress:
+    enabled: true
+  backstage:
+    extraEnvVarsSecrets:
+      - my-backstage-secrets
+    appConfig:
+      auth:
+        environment: "development"
+        session:
+          secret: "${BACKEND_AUTH_SECRET_KEY}"
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true
+      app:
+        branding:
+          fullLogo: https://bcb.gov.br/assets/svg/selo_bc60_intranet.svg
+          fullLogoDark: https://bcb.gov.br/assets/svg/selo_bc60_intranet.svg
+          iconLogo: https://veecode-platform.github.io/support/logos/logo-mobile.png
+        analytics:
+          ga4:
+            measurementId: something
+            #measurementId: ${GA_ANALYTICS_ID}
+            identity: optional
+            testMode: false
+            debug: true
+      backend:
+        csp:
+          img-src: ["'self'","data:","https://raw.githubusercontent.com/","https://avatars.githubusercontent.com/","https://veecode-platform.github.io","https://platform.vee.codes","https://bcb.gov.br"]
+        auth:
+          externalAccess:
+            - type: static
+              options:
+                token: ${BACKEND_AUTH_SECRET_KEY}
+                subject: secret
+      scaffolder:
+        providers:
+          github:
+            - host: "github.com"
+              token: ${GITHUB_TOKEN}
+      platform:
+        guest:
+          enabled: true
+      catalog:
+        locations:
+          - type: url
+            target: https://github.com/veecode-saas-tenants/tenants-catalog/blob/main/catalog-info.yaml
+      integrations:
+        github:
+          - host: "github.com"
+            token: ${GITHUB_TOKEN}
+      grafana:
+        domain: grafana.localhost
+        unifiedAlerting: true
+

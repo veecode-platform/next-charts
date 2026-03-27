@@ -20,92 +20,9 @@ global:
   port: ':8000' # needs quotes, must start with ':' if not empty
 upstream:
   enabled: true
-  fullnameOverride: veecode-devportal
   ingress:
     enabled: true
   backstage:
-    extraEnvVarsSecrets:
-      - my-backstage-secrets
     appConfig:
-      auth:
-        environment: "development"
-        session:
-          secret: "${BACKEND_AUTH_SECRET_KEY}"
-        providers:
-          guest:
-            dangerouslyAllowOutsideDevelopment: true
-          # github:
-          #   development:
-          #     clientId: ${GITHUB_CLIENT_ID}
-          #     clientSecret: ${GITHUB_CLIENT_SECRET}
-          #     signIn:
-          #       resolvers:
-          #         - resolver: usernameMatchingUserEntityName
-          #         - resolver: emailMatchingUserEntityProfileEmail
-          #         - resolver: emailLocalPartMatchingUserEntityName
       app:
-        analytics:
-          ga4:
-            measurementId: something
-            #measurementId: ${GA_ANALYTICS_ID}
-            identity: optional
-            testMode: false
-            debug: true
-      backend:
-        auth:
-          externalAccess:
-            - type: static
-              options:
-                token: ${BACKEND_AUTH_SECRET_KEY}
-                subject: secret
-      scaffolder:
-        providers:
-          github:
-            - host: "github.com"
-              token: ${GITHUB_TOKEN}
-      platform:
-        guest:
-          enabled: true
-      catalog:
-        # providers:
-        #   githubOrg:
-        #     id: providerId
-        #     githubUrl: https://github.com
-        #     orgs:
-        #       - "veecode-saas-tenants"
-        #     schedule:
-        #       frequency:
-        #         minutes: 20
-        #       timeout:
-        #         minutes: 3
-        #   github:
-        #     providerId:
-        #       organization: "veecode-saas-tenants"
-        #       catalogPath: "/catalog-info.yaml"
-        #       validateLocationsExist: true
-        #       filters:
-        #         branch: "main"
-        #         repository: "tenants-catalog"
-        #       schedule:
-        #         frequency:
-        #           minutes: 20
-        #         timeout:
-        #           minutes: 3
-        locations:
-          - type: url
-            target: https://github.com/veecode-saas-tenants/tenants-catalog/blob/main/catalog-info.yaml
-      integrations:
-        github:
-          - host: "github.com"
-            token: ${GITHUB_TOKEN}
-            # apps:
-            #   - appId: ${GITHUB_APP_ID}
-            #     clientId: ${GITHUB_CLIENT_ID}
-            #     clientSecret: ${GITHUB_CLIENT_SECRET}
-            #     privateKey: |
-            #       ${GITHUB_PRIVATE_KEY}
-            #     webhookSecret: ${GITHUB_WEBHOOK_SECRET}
-      grafana:
-        domain: grafana.localhost
-        unifiedAlerting: true
-
+        title: "Devportal Platform (minimal)"

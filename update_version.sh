@@ -58,4 +58,4 @@ else
 fi
 
 echo "Updated $VALUES_FILE and $CHART_FILE to tag $NEW_TAG."
-echo "Please remember commit and push this to main before running 'make release' again."
+echo "Please remember to commit and push to main before running 'make release' again."

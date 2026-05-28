@@ -40,10 +40,13 @@ spec:
         - name: seed-plugins
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # cp -rn (NOT -a): -a would try to preserve timestamps on the PVC mount-point dir, which
+          # the non-root runtime user (1001) doesn't own → "Operation not permitted". -r copies the
+          # bytes, -n no-clobbers so the OCI download cache survives restarts.
           command:
             - bash
             - -c
-            - cp -an /app/dynamic-plugins-root/. /seed/ && echo "seeded baked dynamic plugins into the cache PVC"
+            - cp -rn /app/dynamic-plugins-root/. /seed/ && echo "seeded baked dynamic plugins into the cache PVC"
           securityContext:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}
           volumeMounts:

@@ -15,7 +15,12 @@ WARNING: no credentials configured (existingSecret / credentials are empty).
 Any selected preset that declares required variables will FAIL FAST at boot (exit 78).
 See the per-preset variable matrix in values.yaml (or the chart README).
 {{- end }}
-{{- if gt .Values.replicaCount 1.0 }}
+{{- if and (not .Values.existingSecret) (gt (len .Values.credentials) 0) }}
+
+NOTE: credentials were provided inline and rendered into a Secret (stored in the Helm release).
+For production, prefer `existingSecret` (a Secret you manage) to keep secrets out of values/release.
+{{- end }}
+{{- if gt (int .Values.replicaCount) 1 }}
 {{- if not .Values.database.external.enabled }}
 
 WARNING: replicaCount > 1 with the default SQLite database. SQLite is single-writer and the data

@@ -1,3 +1,6 @@
+{{- if and .Values.database.external.enabled (not (eq (include "veecode-devportal-platform.hasCredentials" .) "true")) }}
+{{- fail "database.external.enabled=true requires PG_HOST/PG_PORT/PG_USER/PG_PASSWORD/PG_DATABASE — provide them via .Values.existingSecret or .Values.credentials" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,6 +26,9 @@ spec:
       {{- end }}
     spec:
       serviceAccountName: {{ include "veecode-devportal-platform.serviceAccountName" . }}
+      # Only mount the SA token when cluster RBAC is granted (in-cluster k8s plugin access).
+      # Default off: the app talks to clusters via K8S_CLUSTER_TOKEN, not the pod's own SA.
+      automountServiceAccountToken: {{ .Values.rbac.clusterRoles.create }}
       {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- range . }}
@@ -47,8 +53,9 @@ spec:
             - bash
             - -c
             - cp -rn /app/dynamic-plugins-root/. /seed/ && echo "seeded baked dynamic plugins into the cache PVC"
+          # The seed only writes to /seed (the PVC); its own root FS can be read-only.
           securityContext:
-            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+            {{- toYaml (merge (dict "readOnlyRootFilesystem" true) (deepCopy .Values.containerSecurityContext)) | nindent 12 }}
           volumeMounts:
             - name: plugins
               mountPath: /seed
@@ -95,8 +102,11 @@ spec:
               value: {{ .Values.theme.downloadUrl | quote }}
             {{- end }}
             {{- if .Values.theme.customJson }}
+            # Pass the JSON string through as-is; the entrypoint validates it (yq merge).
+            # Do NOT fromJson|toJson here — Helm's fromJson returns {"Error":...} on bad input
+            # and would silently ship that as the theme instead of failing.
             - name: THEME_CUSTOM_JSON
-              value: {{ .Values.theme.customJson | fromJson | toJson | quote }}
+              value: {{ .Values.theme.customJson | quote }}
             - name: THEME_MERGE_JSON
               value: {{ .Values.theme.mergeJson | quote }}
             {{- end }}

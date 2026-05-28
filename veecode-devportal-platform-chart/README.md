@@ -63,6 +63,8 @@ Two PersistentVolumeClaims, both **required** for production:
 - `/app/data` (`persistence.data`) — SQLite DBs + marketplace state. Must be a directory PVC. Losing it wipes catalog/marketplace state on restart.
 - `/app/dynamic-plugins-root` (`persistence.plugins`) — OCI plugin bundle cache. A **seed initContainer** copies the image's baked plugins into this PVC on first boot (a bare PVC would otherwise mask the 7 pre-installed plugins, including the homepage, global header, and marketplace catalog). On restart the copy no-clobbers, so the download cache is reused.
 
+> **On image upgrade:** the seed uses `cp -rn` (no-clobber), matching the docker-compose named-volume behaviour, so it will not overwrite pre-installed plugin bytes already in the PVC. After bumping `image.tag` to a build with updated pre-installed plugins, delete the plugins PVC (or point `persistence.plugins.existingClaim` at a fresh one) so the new versions are seeded — the OCI-downloaded plugins re-resolve automatically.
+
 ## Database
 
 Default is **persistent SQLite** on the `/app/data` PVC with `replicaCount: 1`. For scale/HA, set:

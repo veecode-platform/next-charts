@@ -1,0 +1,59 @@
+{{- if .Values.rbac.clusterRoles.create }}
+# Carried over from the V1 chart (templates/clusterroles.yaml): cluster-wide read access for the
+# Backstage kubernetes plugins. Fixed: removed the duplicated `subjects:` key and re-pointed the
+# binding at this chart's ServiceAccount.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}-clusterrole
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+rules:
+  # Resources for the k8s plugins
+  - apiGroups: ["*"]
+    resources:
+      - configmaps
+      - cronjobs
+      - daemonsets
+      - deployments
+      - horizontalpodautoscalers
+      - ingressclasses
+      - ingresses
+      - jobs
+      - limitranges
+      - namespaces
+      - nodes
+      - pods
+      - replicasets
+      - services
+      - statefulsets
+      - resourcequotas
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources: ["jobs", "cronjobs"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["metrics.k8s.io"]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+  - apiGroups: ["core.k8sgpt.ai"]
+    resources: ["results"]
+    verbs: ["get", "list"]
+  - apiGroups: ["zora.undistro.io"]
+    resources: ["clusterissues", "vulnerabilityreports"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}-clusterrolebinding
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "veecode-devportal-platform.fullname" . }}-clusterrole
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "veecode-devportal-platform.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

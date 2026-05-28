@@ -1,0 +1,25 @@
+VeeCode DevPortal V2 — release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}".
+
+Presets enabled: {{ join "," .Values.presets | default "(none — core only)" }}
+
+1. First boot pulls OCI plugins (can take a few minutes). Watch the rollout:
+   kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "veecode-devportal-platform.fullname" . }} --timeout=10m
+
+2. Health is GET :{{ .Values.service.port }}/healthcheck (200 = ready):
+   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "veecode-devportal-platform.fullname" . }} {{ .Values.service.port }}:{{ .Values.service.port }}
+   curl -sf localhost:{{ .Values.service.port }}/healthcheck && echo " OK"
+
+{{- if not (eq (include "veecode-devportal-platform.hasCredentials" .) "true") }}
+
+WARNING: no credentials configured (existingSecret / credentials are empty).
+Any selected preset that declares required variables will FAIL FAST at boot (exit 78).
+See the per-preset variable matrix in values.yaml (or the chart README).
+{{- end }}
+{{- if gt .Values.replicaCount 1.0 }}
+{{- if not .Values.database.external.enabled }}
+
+WARNING: replicaCount > 1 with the default SQLite database. SQLite is single-writer and the data
+PVC is ReadWriteOnce — run a single replica, or set database.external.enabled and point at an
+external PostgreSQL.
+{{- end }}
+{{- end }}

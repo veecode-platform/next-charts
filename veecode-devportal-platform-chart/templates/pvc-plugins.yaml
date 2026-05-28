@@ -1,0 +1,17 @@
+{{- if and .Values.persistence.plugins.enabled (not .Values.persistence.plugins.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}-plugins
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.persistence.plugins.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.plugins.size | quote }}
+  {{- if .Values.persistence.plugins.storageClass }}
+  storageClassName: {{ .Values.persistence.plugins.storageClass | quote }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,9 @@
+# Negative test: github-auth selected but GITHUB_PAT is omitted from credentials.
+# Expectation on a real cluster: the pod terminates with exit 78 and a "requires GITHUB_PAT" message.
+presets:
+  - github-auth
+
+credentials:
+  GITHUB_ORG: my-org
+  GITHUB_AUTH_CLIENT_ID: Iv1.dummyclientid
+  GITHUB_AUTH_CLIENT_SECRET: dummyclientsecret

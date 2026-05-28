@@ -1,0 +1,12 @@
+# Typical composition: curated baseline + GitHub integration + GitHub sign-in.
+# Dummy credentials — for `helm template`/lint only (NOT a working deployment).
+presets:
+  - recommended
+  - github
+  - github-auth
+
+credentials:
+  GITHUB_PAT: ghp_dummy0000000000000000000000000000
+  GITHUB_ORG: my-org
+  GITHUB_AUTH_CLIENT_ID: Iv1.dummyclientid
+  GITHUB_AUTH_CLIENT_SECRET: dummyclientsecret

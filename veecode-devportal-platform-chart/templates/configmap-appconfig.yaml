@@ -1,0 +1,18 @@
+{{- if or (gt (len .Values.appConfig) 0) .Values.database.external.enabled }}
+{{- $cfg := deepCopy .Values.appConfig }}
+{{- if .Values.database.external.enabled }}
+{{- $conn := dict "host" "${PG_HOST}" "port" "${PG_PORT}" "user" "${PG_USER}" "password" "${PG_PASSWORD}" "database" "${PG_DATABASE}" }}
+{{- $backend := default (dict) (get $cfg "backend") }}
+{{- $_ := set $backend "database" (dict "client" "pg" "connection" $conn) }}
+{{- $_ := set $cfg "backend" $backend }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}-appconfig
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+data:
+  app-config.local.yaml: |
+    {{- toYaml $cfg | nindent 4 }}
+{{- end }}

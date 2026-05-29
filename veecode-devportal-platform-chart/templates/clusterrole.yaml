@@ -9,25 +9,31 @@ metadata:
   labels:
     {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
 rules:
-  # Resources for the k8s plugins
-  - apiGroups: ["*"]
+  # Resources for the k8s plugins — scoped to explicit apiGroups (was apiGroups: ["*"]
+  # in V1; narrowed so the role does not grant reads on unrelated CRDs that reuse these
+  # resource names). Read-only.
+  - apiGroups: [""]
     resources:
       - configmaps
-      - cronjobs
-      - daemonsets
-      - deployments
-      - horizontalpodautoscalers
-      - ingressclasses
-      - ingresses
-      - jobs
       - limitranges
       - namespaces
       - nodes
       - pods
-      - replicasets
-      - services
-      - statefulsets
       - resourcequotas
+      - services
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["ingresses", "ingressclasses"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["batch"]
     resources: ["jobs", "cronjobs"]

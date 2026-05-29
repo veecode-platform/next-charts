@@ -1,0 +1,2 @@
+# Core only — no presets, no credentials. Boots with catalog + global header.
+presets: []

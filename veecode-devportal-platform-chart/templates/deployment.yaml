@@ -1,0 +1,191 @@
+{{- if and .Values.database.external.enabled (not (eq (include "veecode-devportal-platform.hasCredentials" .) "true")) }}
+{{- fail "database.external.enabled=true requires PG_HOST/PG_PORT/PG_USER/PG_PASSWORD/PG_DATABASE — provide them via .Values.existingSecret or .Values.credentials" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "veecode-devportal-platform.selectorLabels" . | nindent 6 }}
+  # Recreate, not RollingUpdate: SQLite is single-writer and the PVCs are RWO, so two pods
+  # must never mount the data volume at once.
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{- include "veecode-devportal-platform.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ include "veecode-devportal-platform.serviceAccountName" . }}
+      # Only mount the SA token when cluster RBAC is granted (in-cluster k8s plugin access).
+      # Default off: the app talks to clusters via K8S_CLUSTER_TOKEN, not the pod's own SA.
+      automountServiceAccountToken: {{ .Values.rbac.clusterRoles.create }}
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- range . }}
+        - name: {{ . }}
+        {{- end }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.persistence.plugins.enabled }}
+      # Seed initContainer (NOT the forbidden plugin-install initContainer): the image bakes 7
+      # preInstalled plugins into /app/dynamic-plugins-root, which install-dynamic-plugins.py SKIPS
+      # installing (it assumes the bytes are on disk). A k8s PVC mounts empty and masks those bytes,
+      # so we copy them in once. `cp -an` no-clobbers on restart, preserving the download cache.
+      initContainers:
+        - name: seed-plugins
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          # cp -rn (NOT -a): -a would try to preserve timestamps on the PVC mount-point dir, which
+          # the non-root runtime user (1001) doesn't own → "Operation not permitted". -r copies the
+          # bytes, -n no-clobbers so the OCI download cache survives restarts.
+          command:
+            - bash
+            - -c
+            - cp -rn /app/dynamic-plugins-root/. /seed/ && echo "seeded baked dynamic plugins into the cache PVC"
+          # The seed only writes to /seed (the PVC); its own root FS can be read-only.
+          securityContext:
+            {{- toYaml (merge (dict "readOnlyRootFilesystem" true) (deepCopy .Values.containerSecurityContext)) | nindent 12 }}
+          volumeMounts:
+            - name: plugins
+              mountPath: /seed
+      {{- end }}
+      containers:
+        - name: devportal
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: VEECODE_PRESETS
+              value: {{ join "," .Values.presets | quote }}
+            {{- if .Values.pluginRegistry }}
+            - name: PLUGIN_REGISTRY
+              value: {{ .Values.pluginRegistry | quote }}
+            {{- end }}
+            {{- if .Values.catalogIndexImage }}
+            - name: CATALOG_INDEX_IMAGE
+              value: {{ .Values.catalogIndexImage | quote }}
+            {{- end }}
+            {{- if .Values.backstageVersion }}
+            - name: BACKSTAGE_VERSION
+              value: {{ .Values.backstageVersion | quote }}
+            {{- end }}
+            {{- if .Values.dynamicPluginsTolerateFailures }}
+            - name: DYNAMIC_PLUGINS_TOLERATE_FAILURES
+              value: "true"
+            {{- end }}
+            {{- if .Values.catalogIndexRefresh }}
+            - name: CATALOG_INDEX_REFRESH
+              value: "true"
+            {{- end }}
+            {{- if .Values.appConfigBase64 }}
+            - name: VEECODE_APP_CONFIG
+              value: {{ .Values.appConfigBase64 | quote }}
+            {{- end }}
+            {{- if .Values.theme.downloadUrl }}
+            - name: THEME_DOWNLOAD_URL
+              value: {{ .Values.theme.downloadUrl | quote }}
+            {{- end }}
+            {{- if .Values.theme.customJson }}
+            # Pass the JSON string through as-is; the entrypoint validates it (yq merge).
+            # Do NOT fromJson|toJson here — Helm's fromJson returns {"Error":...} on bad input
+            # and would silently ship that as the theme instead of failing.
+            - name: THEME_CUSTOM_JSON
+              value: {{ .Values.theme.customJson | quote }}
+            - name: THEME_MERGE_JSON
+              value: {{ .Values.theme.mergeJson | quote }}
+            {{- end }}
+            {{- if .Values.theme.favIcon }}
+            - name: THEME_FAV_ICON
+              value: {{ .Values.theme.favIcon | quote }}
+            {{- end }}
+            {{- with .Values.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if eq (include "veecode-devportal-platform.hasCredentials" .) "true" }}
+          envFrom:
+            - secretRef:
+                name: {{ include "veecode-devportal-platform.secretName" . }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            {{- if .Values.persistence.plugins.enabled }}
+            - name: plugins
+              mountPath: /app/dynamic-plugins-root
+            {{- end }}
+            {{- if or (gt (len .Values.appConfig) 0) .Values.database.external.enabled }}
+            - name: appconfig
+              mountPath: /app/app-config.local.yaml
+              subPath: app-config.local.yaml
+            {{- end }}
+          startupProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            {{- toYaml .Values.startupProbe | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: http
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          {{- if .Values.persistence.data.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.data.existingClaim }}
+          {{- else if .Values.persistence.data.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "veecode-devportal-platform.fullname" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        {{- if .Values.persistence.plugins.enabled }}
+        - name: plugins
+          {{- if .Values.persistence.plugins.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.plugins.existingClaim }}
+          {{- else }}
+          persistentVolumeClaim:
+            claimName: {{ include "veecode-devportal-platform.fullname" . }}-plugins
+          {{- end }}
+        {{- end }}
+        {{- if or (gt (len .Values.appConfig) 0) .Values.database.external.enabled }}
+        - name: appconfig
+          configMap:
+            name: {{ include "veecode-devportal-platform.fullname" . }}-appconfig
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

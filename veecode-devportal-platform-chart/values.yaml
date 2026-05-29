@@ -1,0 +1,182 @@
+# Default values for veecode-devportal-platform.
+# Built FROM the V2 runtime contract (devportal-platform/entrypoint.sh), not ported from the V1 chart.
+
+# -- Name overrides (standard Helm).
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker.io/veecode/devportal
+  # Pinned. NEVER use :latest — :latest still serves the 1.x distro line.
+  tag: "2.0.0"
+  pullPolicy: IfNotPresent
+  # List of imagePullSecret names (e.g. for a private mirror).
+  pullSecrets: []
+
+# V2 enablement model. This list is joined with "," into the VEECODE_PRESETS env var.
+# Empty list = core only (catalog + global header).
+# At most ONE identity preset may be selected (github-auth | azure-auth | gitlab | keycloak | ldap);
+# selecting two from that group fails the boot with exit 78.
+presets:
+  - recommended
+
+# ── Credentials ───────────────────────────────────────────────────────────────
+# Each preset declares `requires.variables`; missing required vars fail the boot (exit 78).
+# Provide them via ONE of:
+#   * existingSecret — name of a Secret you manage (recommended for production); consumed via envFrom.
+#   * credentials    — a key→value map the chart renders into a Secret (dev convenience; values are
+#                      stored in plaintext in your values file / release).
+#
+# Per-preset required variables ((S) = secret; route ALL of a preset's vars through the Secret for
+# simplicity; [optional] in brackets):
+#
+#   IDENTITY presets — pick AT MOST ONE (exclusive_group: identity):
+#     github-auth : GITHUB_PAT(S), GITHUB_ORG, GITHUB_AUTH_CLIENT_ID, GITHUB_AUTH_CLIENT_SECRET(S)
+#     azure-auth  : AZURE_AUTH_TENANT_ID, AZURE_AUTH_CLIENT_ID, AZURE_AUTH_CLIENT_SECRET(S)
+#     gitlab      : GITLAB_HOST, GITLAB_AUTH_CLIENT_ID, GITLAB_AUTH_CLIENT_SECRET(S), GITLAB_TOKEN(S),
+#                   GITLAB_GROUP, [GITLAB_GROUP_PATTERN]
+#     keycloak    : KEYCLOAK_BASE_URL, KEYCLOAK_REALM, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET(S),
+#                   AUTH_SESSION_SECRET(S)
+#     ldap        : LDAP_URL, LDAP_DN, LDAP_SECRET(S), LDAP_USERS_BASE_DN, LDAP_GROUPS_BASE_DN,
+#                   [LDAP_USERS_FILTER], [LDAP_GROUPS_FILTER]
+#
+#   INTEGRATION presets (composable):
+#     github      : GITHUB_PAT(S), GITHUB_ORG
+#     azure       : AZURE_DEVOPS_TOKEN(S), AZURE_DEVOPS_HOST, AZURE_DEVOPS_ORG, AZURE_DEVOPS_PROJECT
+#     jenkins     : JENKINS_URL, JENKINS_USERNAME, JENKINS_TOKEN(S)
+#     kubernetes  : K8S_CLUSTER_NAME, K8S_CLUSTER_URL, K8S_CLUSTER_TOKEN(S)  (also set rbac.clusterRoles.create=true)
+#     sonarqube   : SONARQUBE_BASE_URL, SONARQUBE_API_KEY(S)
+#     mcp-chat    : MCP_CHAT_PROVIDER, MCP_CHAT_API_KEY(S), MCP_CHAT_MODEL
+#
+#   NO required vars: recommended, veecode-theme, mcp, ldap-ad
+existingSecret: ""
+credentials: {}
+#   GITHUB_PAT: ghp_xxx
+#   GITHUB_ORG: my-org
+#   GITHUB_AUTH_CLIENT_ID: Iv1.xxxx
+#   GITHUB_AUTH_CLIENT_SECRET: xxxx
+
+# Extra non-secret env vars (rendered after the well-known knobs below).
+extraEnv: []
+#   - name: SOME_FLAG
+#     value: "true"
+
+# ── Well-known image knobs (omit to use image defaults) ─────────────────────────
+pluginRegistry: ""                  # → PLUGIN_REGISTRY  (mirror / air-gap; image default quay.io/veecode)
+catalogIndexImage: ""               # → CATALOG_INDEX_IMAGE (mirror / air-gap; index is baked into the image)
+backstageVersion: ""                # → BACKSTAGE_VERSION (rarely; image default from backstage.json = 1.49.4)
+dynamicPluginsTolerateFailures: false  # → DYNAMIC_PLUGINS_TOLERATE_FAILURES (keep false to fail-fast on bad plugins)
+catalogIndexRefresh: false          # → CATALOG_INDEX_REFRESH (force re-pull of the baked catalog index)
+appConfigBase64: ""                 # → VEECODE_APP_CONFIG (base64 of an app-config; alternative to appConfig below)
+
+# Theming (alternative to the veecode-theme preset). THEME_* env is rendered only when set.
+theme:
+  downloadUrl: ""                   # THEME_DOWNLOAD_URL
+  customJson: ""                    # THEME_CUSTOM_JSON (a JSON string)
+  mergeJson: "true"                 # THEME_MERGE_JSON ("false" replaces the default theme instead of merging)
+  favIcon: ""                       # THEME_FAV_ICON
+
+# Operator app-config.local.yaml (config layer 5 — loads AFTER presets/distro, so it overrides them).
+# KEEP MINIMAL. Rendered to a ConfigMap and mounted read-only at /app/app-config.local.yaml only when non-empty.
+# Note: app.title is baked at build time and cannot be overridden here.
+appConfig: {}
+#   backend:
+#     reading:
+#       allow:
+#         - host: internal-host.example.com
+
+persistence:
+  # /app/data — per-plugin SQLite DBs + extensions-install.yaml. MUST be a directory PVC
+  # (atomic-rename writes fail on a single-file mount). Losing this wipes catalog/marketplace state.
+  data:
+    enabled: true
+    size: 1Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: ""
+    existingClaim: ""
+  # /app/dynamic-plugins-root — OCI bundle cache. Seeded from the image's baked plugins by an
+  # initContainer (a k8s PVC mounts empty and would otherwise MASK the 7 preInstalled plugins —
+  # homepage, global-header, marketplace catalog ingester, etc.). Without it, every pod re-pulls plugins.
+  plugins:
+    enabled: true
+    size: 2Gi
+    accessModes:
+      - ReadWriteOnce
+    storageClass: ""
+    existingClaim: ""
+
+# External PostgreSQL (opt-in, for scale/HA). When enabled, a backend.database block is injected into
+# app-config.local.yaml using ${PG_*} resolved from the credentials Secret. NO bundled subchart.
+# Provide PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DATABASE in existingSecret/credentials.
+# Only then is replicaCount > 1 safe (default SQLite is single-writer / single-replica).
+database:
+  external:
+    enabled: false
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 7007
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: devportal.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    cpu: "1"
+    memory: 2Gi
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+rbac:
+  clusterRoles:
+    # Cluster-wide read access for the `kubernetes` preset (workloads tab). Off by default.
+    create: false
+
+# Runtime user is UID 1001 / GID 0 (UBI nodejs `default`). fsGroup is added as a supplemental group
+# so both PVCs are writable. On OpenShift, runAsUser is overridden by the assigned SCC UID (image is
+# GID-0-writable). readOnlyRootFilesystem MUST stay false — the entrypoint writes into /app at boot.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  fsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  capabilities:
+    drop:
+      - ALL
+
+# Probes — all hit GET :7007/healthcheck. startupProbe is generous: first boot pulls OCI plugins.
+startupProbe:
+  failureThreshold: 60
+  periodSeconds: 5
+readinessProbe:
+  periodSeconds: 10
+  failureThreshold: 3
+livenessProbe:
+  periodSeconds: 20
+  failureThreshold: 3
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

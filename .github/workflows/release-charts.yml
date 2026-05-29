@@ -1,0 +1,72 @@
+name: release-charts
+
+# Publishes Helm charts to the gh-pages-style repo this project already uses:
+# packaged .tgz + index.yaml committed under docs/, served by GitHub Pages from
+# main/docs. Runs when a chart dir changes on main (a version bump → a new release)
+# or on manual dispatch. Charts whose .tgz is already published are skipped, so a
+# non-version change (e.g. README) produces no release commit.
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "veecode-devportal-chart/**"
+      - "veecode-devportal-platform-chart/**"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-charts
+  cancel-in-progress: false
+
+jobs:
+  package-and-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Package new chart versions into docs/
+        run: |
+          set -euo pipefail
+          mkdir -p docs
+          for chart in veecode-devportal-chart veecode-devportal-platform-chart; do
+            [ -f "$chart/Chart.yaml" ] || continue
+            name=$(grep -E '^name:' "$chart/Chart.yaml" | head -1 | awk '{print $2}')
+            version=$(grep -E '^version:' "$chart/Chart.yaml" | head -1 | awk '{print $2}')
+            if [ -f "docs/${name}-${version}.tgz" ]; then
+              echo "docs/${name}-${version}.tgz already published — skipping"
+            else
+              echo "packaging ${name} ${version}"
+              # --dependency-update so subchart deps (e.g. the V1 upstream chart) resolve
+              helm package "$chart" -d docs/ --dependency-update
+            fi
+          done
+
+      - name: Regenerate index (merge, preserve existing entries)
+        run: |
+          set -euo pipefail
+          helm repo index docs/ \
+            --url https://veecode-platform.github.io/next-charts \
+            --merge docs/index.yaml
+
+      - name: Commit & push if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- docs/ && git diff --cached --quiet -- docs/; then
+            echo "no new chart versions to publish"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/
+          git commit -m "publish: update helm repo index [skip ci]"
+          git push

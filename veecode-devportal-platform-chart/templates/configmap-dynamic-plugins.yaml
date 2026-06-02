@@ -1,0 +1,11 @@
+{{- if gt (len .Values.dynamicPlugins) 0 }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "veecode-devportal-platform.fullname" . }}-dynamic-plugins
+  labels:
+    {{- include "veecode-devportal-platform.labels" . | nindent 4 }}
+data:
+  dynamic-plugins.yaml: |
+    {{- toYaml .Values.dynamicPlugins | nindent 4 }}
+{{- end }}

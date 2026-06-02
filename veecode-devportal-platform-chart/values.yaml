@@ -85,6 +85,18 @@ appConfig: {}
 #       allow:
 #         - host: internal-host.example.com
 
+# Operator dynamic-plugins.yaml override — plugin SELECTION (distinct from app-config above).
+# Rendered to a ConfigMap and mounted read-only at /app/dynamic-plugins.yaml only when non-empty.
+# Coexists with `presets` and the in-portal marketplace: the image's entrypoint unions the default
+# catalog + extensions-install.yaml (marketplace) + this file + presets at boot. Use when an
+# orchestrator (e.g. the SaaS) must inject a per-deployment raw plugin selection presets don't express.
+dynamicPlugins: {}
+#   includes:
+#     - dynamic-plugins.default.yaml
+#   plugins:
+#     - package: "oci://${PLUGIN_REGISTRY}/<workspace>:bs_${BACKSTAGE_VERSION}!<selector>"
+#       disabled: false
+
 persistence:
   # /app/data — per-plugin SQLite DBs + extensions-install.yaml. MUST be a directory PVC
   # (atomic-rename writes fail on a single-file mount). Losing this wipes catalog/marketplace state.

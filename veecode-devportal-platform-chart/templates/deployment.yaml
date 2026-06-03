@@ -134,6 +134,11 @@ spec:
               mountPath: /app/app-config.local.yaml
               subPath: app-config.local.yaml
             {{- end }}
+            {{- if gt (len .Values.dynamicPlugins) 0 }}
+            - name: dynamic-plugins
+              mountPath: /app/dynamic-plugins.yaml
+              subPath: dynamic-plugins.yaml
+            {{- end }}
           startupProbe:
             httpGet:
               path: /healthcheck
@@ -176,6 +181,11 @@ spec:
         - name: appconfig
           configMap:
             name: {{ include "veecode-devportal-platform.fullname" . }}-appconfig
+        {{- end }}
+        {{- if gt (len .Values.dynamicPlugins) 0 }}
+        - name: dynamic-plugins
+          configMap:
+            name: {{ include "veecode-devportal-platform.fullname" . }}-dynamic-plugins
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

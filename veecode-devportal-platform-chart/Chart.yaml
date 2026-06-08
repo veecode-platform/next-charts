@@ -2,8 +2,8 @@ apiVersion: v2
 name: veecode-devportal-platform
 description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven, persistent SQLite by default, entrypoint-owned plugin install.
 type: application
-version: 0.2.0
-appVersion: "2.0.0"
+version: 0.3.0
+appVersion: "2.1.0"
 home: https://platform.vee.codes/
 icon: https://platform.vee.codes/android-chrome-512x512.png
 sources:

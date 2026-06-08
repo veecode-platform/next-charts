@@ -8,7 +8,7 @@ fullnameOverride: ""
 image:
   repository: docker.io/veecode/devportal
   # Pinned. NEVER use :latest — :latest still serves the 1.x distro line.
-  tag: "2.1.0"
+  tag: "2.1.1"
   pullPolicy: IfNotPresent
   # List of imagePullSecret names (e.g. for a private mirror).
   pullSecrets: []

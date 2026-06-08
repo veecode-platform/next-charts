@@ -1,0 +1,218 @@
+name: sync-platform-version
+
+# Design A — keep the V2 chart (veecode-devportal-platform-chart) tracking the
+# devportal-platform IMAGE version automatically, with zero new secrets.
+#
+# Source of truth = the latest NON-prerelease GitHub Release of
+# veecode-platform/devportal-platform. This reconciler:
+#   1. resolves the target image version (dispatch fast-path OR releases/latest),
+#   2. HARD-rejects anything that is not a stable x.y.z (no -rc/-alpha/-beta/-preview),
+#   3. exits no-op if the chart's appVersion already equals the target (idempotent),
+#   4. otherwise bumps image.tag + appVersion to the target and the chart `version`
+#      per the bump rule (image patch->chart patch, image minor/major->chart minor;
+#      major also emits a ::warning:: — the chart deliberately stays 0.x),
+#   5. commits to main as github-actions[bot] (NO [skip ci]),
+#   6. explicitly dispatches release-charts.yml.
+#
+# WHY step 6 (and not "let the push trigger release-charts"): GitHub does NOT fire
+# workflows for push events authored by the automatic GITHUB_TOKEN (recursion guard).
+# So the commit alone would NEVER publish. workflow_dispatch / repository_dispatch are
+# the only events GITHUB_TOKEN may trigger, so we kick release-charts explicitly — the
+# same pattern devportal-platform's release.yml uses to kick publish.yml. This needs
+# `actions: write`. (If a maintainer later adds a PAT, the explicit dispatch is
+# harmless; release-charts skips when the .tgz already exists.)
+
+on:
+  schedule:
+    # Daily at 06:00 UTC. The reconciler is idempotent, so an empty run is a cheap no-op.
+    - cron: "0 6 * * *"
+  workflow_dispatch: {}
+  repository_dispatch:
+    # Fast-path hook for a future devportal-platform publish.yml step. Not wired up on
+    # the platform side yet (maintainer chose schedule-only). client_payload.version
+    # is honored when present; otherwise we fall back to releases/latest.
+    types: [platform-image-released]
+
+permissions:
+  contents: write
+  actions: write   # required to dispatch release-charts.yml via the API
+
+concurrency:
+  group: sync-platform-version
+  cancel-in-progress: false
+
+env:
+  CHART_DIR: veecode-devportal-platform-chart
+  PLATFORM_REPO: veecode-platform/devportal-platform
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install yq
+        run: |
+          set -euo pipefail
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          yq --version
+
+      - name: Resolve target image version
+        id: resolve
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PAYLOAD_VERSION: ${{ github.event.client_payload.version }}
+        run: |
+          set -euo pipefail
+          # 1. Prefer the repository_dispatch fast-path payload, else releases/latest.
+          #    `releases/latest` already excludes prereleases and drafts.
+          if [ -n "${PAYLOAD_VERSION:-}" ]; then
+            TARGET="${PAYLOAD_VERSION}"
+            echo "source=repository_dispatch client_payload.version=${TARGET}"
+          else
+            TARGET="$(gh api "repos/${PLATFORM_REPO}/releases/latest" --jq .tag_name)"
+            echo "source=releases/latest tag_name=${TARGET}"
+          fi
+          # Strip a leading v if a tag ever uses one (devportal-platform tags do not).
+          TARGET="${TARGET#v}"
+
+          # 2. HARD guard: stable x.y.z only. Rejects -rc/-alpha/-beta/-preview and any junk.
+          if ! printf '%s' "${TARGET}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::resolved target version '${TARGET}' is not a stable x.y.z release — refusing to sync."
+            exit 1
+          fi
+          echo "Resolved stable target image version: ${TARGET}"
+          echo "target=${TARGET}" >> "$GITHUB_OUTPUT"
+
+      - name: Read current chart state
+        id: current
+        run: |
+          set -euo pipefail
+          APP="$(yq -r '.appVersion' "${CHART_DIR}/Chart.yaml")"
+          CHART="$(yq -r '.version' "${CHART_DIR}/Chart.yaml")"
+          TAG="$(yq -r '.image.tag' "${CHART_DIR}/values.yaml")"
+          echo "current appVersion=${APP} chart version=${CHART} image.tag=${TAG}"
+          # Invariant the chart must always hold; if it is already broken, fail loudly
+          # rather than silently "fixing" a state a human should look at.
+          if [ "${APP}" != "${TAG}" ]; then
+            echo "::error::pre-existing drift: Chart.yaml appVersion (${APP}) != values.yaml image.tag (${TAG}). Fix by hand before letting the reconciler run."
+            exit 1
+          fi
+          echo "app=${APP}" >> "$GITHUB_OUTPUT"
+          echo "chart=${CHART}" >> "$GITHUB_OUTPUT"
+
+      - name: Idempotency check
+        id: idem
+        env:
+          APP: ${{ steps.current.outputs.app }}
+          TARGET: ${{ steps.resolve.outputs.target }}
+        run: |
+          set -euo pipefail
+          if [ "${APP}" = "${TARGET}" ]; then
+            echo "appVersion already ${TARGET} — nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute chart version bump
+        id: bump
+        if: steps.idem.outputs.changed == 'true'
+        env:
+          APP: ${{ steps.current.outputs.app }}
+          CHART: ${{ steps.current.outputs.chart }}
+          TARGET: ${{ steps.resolve.outputs.target }}
+        run: |
+          set -euo pipefail
+          IFS=. read -r oa ob _oc <<<"${APP}"
+          IFS=. read -r na nb nc <<<"${TARGET}"
+          IFS=. read -r cx cy cz <<<"${CHART}"
+          # Bump rule (chart stays 0.x):
+          #   image major (na>oa)            -> chart MINOR + ::warning::
+          #   image minor (na==oa, nb>ob)    -> chart MINOR
+          #   image patch (na==oa, nb==ob, nc>oc) -> chart PATCH
+          #   anything else (downgrade/equal) -> error
+          if [ "${na}" -gt "${oa}" ]; then
+            NEW_CHART="${cx}.$((cy+1)).0"
+            echo "::warning::devportal-platform MAJOR image bump ${APP} -> ${TARGET}. Chart bumped MINOR (${CHART} -> ${NEW_CHART}) to stay 0.x; review ${CHART_DIR} templates for breaking changes before relying on this release."
+          elif [ "${na}" -eq "${oa}" ] && [ "${nb}" -gt "${ob}" ]; then
+            NEW_CHART="${cx}.$((cy+1)).0"
+          elif [ "${na}" -eq "${oa}" ] && [ "${nb}" -eq "${ob}" ] && [ "${nc}" -gt "${_oc:-0}" ]; then
+            NEW_CHART="${cx}.${cy}.$((cz+1))"
+          else
+            echo "::error::target ${TARGET} is not an increment over current appVersion ${APP} (downgrade or unexpected). Refusing."
+            exit 1
+          fi
+          echo "Chart version: ${CHART} -> ${NEW_CHART}"
+          echo "new_chart=${NEW_CHART}" >> "$GITHUB_OUTPUT"
+
+      - name: Apply edits
+        id: edit
+        if: steps.idem.outputs.changed == 'true'
+        env:
+          TARGET: ${{ steps.resolve.outputs.target }}
+          NEW_CHART: ${{ steps.bump.outputs.new_chart }}
+        run: |
+          set -euo pipefail
+          # Chart.yaml: yq is safe here (no blank lines / aligned comments to disturb).
+          # strenv() keeps appVersion quoted; version stays an unquoted SemVer scalar.
+          TARGET="${TARGET}" yq -i '.appVersion = strenv(TARGET)' "${CHART_DIR}/Chart.yaml"
+          NEW_CHART="${NEW_CHART}" yq -i '.version = strenv(NEW_CHART)' "${CHART_DIR}/Chart.yaml"
+
+          # values.yaml is heavily commented with column-aligned trailing comments and
+          # blank lines that `yq -i` would destroy (it reserializes the whole file).
+          # So edit ONLY the single quoted image.tag line in place, preserving the rest
+          # byte-for-byte. There is exactly one `tag:` key in this file.
+          before="$(grep -cE '^\s*tag:\s*"[^"]*"\s*$' "${CHART_DIR}/values.yaml")"
+          if [ "${before}" != "1" ]; then
+            echo "::error::expected exactly one quoted image.tag line in ${CHART_DIR}/values.yaml, found ${before}. Aborting."
+            exit 1
+          fi
+          TARGET="${TARGET}" perl -i -pe 's/^(\s*tag:\s*)"[^"]*"(\s*)$/${1}"$ENV{TARGET}"${2}/' "${CHART_DIR}/values.yaml"
+
+          # Verify the three fields landed and the invariant holds.
+          GOT_APP="$(yq -r '.appVersion' "${CHART_DIR}/Chart.yaml")"
+          GOT_VER="$(yq -r '.version' "${CHART_DIR}/Chart.yaml")"
+          GOT_TAG="$(yq -r '.image.tag' "${CHART_DIR}/values.yaml")"
+          echo "after: appVersion=${GOT_APP} version=${GOT_VER} image.tag=${GOT_TAG}"
+          [ "${GOT_APP}" = "${TARGET}" ]    || { echo "::error::appVersion not applied"; exit 1; }
+          [ "${GOT_VER}" = "${NEW_CHART}" ] || { echo "::error::chart version not applied"; exit 1; }
+          [ "${GOT_TAG}" = "${TARGET}" ]    || { echo "::error::image.tag not applied"; exit 1; }
+          [ "${GOT_APP}" = "${GOT_TAG}" ]   || { echo "::error::invariant appVersion==image.tag broken"; exit 1; }
+
+      - name: Commit to main
+        id: commit
+        if: steps.idem.outputs.changed == 'true'
+        env:
+          TARGET: ${{ steps.resolve.outputs.target }}
+          NEW_CHART: ${{ steps.bump.outputs.new_chart }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "${CHART_DIR}/Chart.yaml" "${CHART_DIR}/values.yaml"
+          if git diff --cached --quiet; then
+            echo "no staged changes after edits — unexpected, but nothing to commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # NO [skip ci]: release-charts.yml must run. (It is kicked explicitly in the
+          # next step because a GITHUB_TOKEN push does not fire workflows.)
+          git commit -m "chore(platform-chart): track image ${TARGET} (chart ${NEW_CHART})" -m "If pre-installed plugins changed, consumers may need to recreate the persistence.plugins PVC (seed is cp -rn). See chart README."
+          git push origin HEAD:main
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger release-charts (publish the new chart version)
+        if: steps.idem.outputs.changed == 'true' && steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # A GITHUB_TOKEN-authored push does NOT trigger release-charts.yml. Dispatch it
+          # explicitly against main (it picks up the just-pushed commit and packages the
+          # new .tgz + reindexes). Idempotent on its side: skips an already-published .tgz.
+          gh workflow run release-charts.yml --ref main --repo "${GITHUB_REPOSITORY}"
+          echo "Dispatched release-charts.yml on main."

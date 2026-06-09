@@ -29,8 +29,8 @@ on:
     - cron: "0 6 * * *"
   workflow_dispatch: {}
   repository_dispatch:
-    # Fast-path hook for a future devportal-platform publish.yml step. Not wired up on
-    # the platform side yet (maintainer chose schedule-only). client_payload.version
+    # Fast-path hook: devportal-platform publish.yml dispatches this on a stable release
+    # (the notify-downstream job, wired up in devportal-platform#54). client_payload.version
     # is honored when present; otherwise we fall back to releases/latest.
     types: [platform-image-released]
 

@@ -6,15 +6,20 @@ Helm chart for **VeeCode DevPortal V2** (the `devportal-platform` image line). S
 
 ## Quick start
 
-**Installing DevPortal?** Use the published chart from this repo's Helm repo — not a local path:
+**Installing DevPortal?** Point straight at the published repo URL — not a local path, and no need to `helm repo add` first:
+
+```sh
+helm install devportal veecode-devportal-platform \
+  --repo https://veecode-platform.github.io/next-charts \
+  --set 'presets={recommended,github,github-auth}' \
+  --set existingSecret=my-devportal-creds        # Secret holding the preset's required vars
+```
+
+Prefer a persistent local alias (handy for repeated `helm search`/`helm show values`)? Add the repo once, then swap `veecode-devportal-platform --repo <url>` for `next-charts/veecode-devportal-platform`:
 
 ```sh
 helm repo add next-charts https://veecode-platform.github.io/next-charts
 helm repo update next-charts
-
-helm install devportal next-charts/veecode-devportal-platform \
-  --set 'presets={recommended,github,github-auth}' \
-  --set existingSecret=my-devportal-creds        # Secret holding the preset's required vars
 ```
 
 Full walkthrough (Secret creation, PostgreSQL, ingress): [Deploy to Kubernetes](https://docs.platform.vee.codes/devportal/installation-guide/production-setup/setup).

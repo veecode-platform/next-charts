@@ -6,6 +6,21 @@ Helm chart for **VeeCode DevPortal V2** (the `devportal-platform` image line). S
 
 ## Quick start
 
+**Installing DevPortal?** Use the published chart from this repo's Helm repo — not a local path:
+
+```sh
+helm repo add next-charts https://veecode-platform.github.io/next-charts
+helm repo update next-charts
+
+helm install devportal next-charts/veecode-devportal-platform \
+  --set 'presets={recommended,github,github-auth}' \
+  --set existingSecret=my-devportal-creds        # Secret holding the preset's required vars
+```
+
+Full walkthrough (Secret creation, PostgreSQL, ingress): [Deploy to Kubernetes](https://docs.platform.vee.codes/devportal/installation-guide/production-setup/setup).
+
+**Working on this chart's source?** Install straight from the local checkout instead:
+
 ```sh
 helm install dp ./veecode-devportal-platform-chart \
   --set 'presets={recommended,github,github-auth}' \

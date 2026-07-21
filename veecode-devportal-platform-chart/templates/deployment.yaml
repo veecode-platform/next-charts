@@ -20,10 +20,18 @@ spec:
     metadata:
       labels:
         {{- include "veecode-devportal-platform.selectorLabels" . | nindent 8 }}
-      {{- with .Values.podAnnotations }}
       annotations:
+        # Force a rollout when a chart-rendered ConfigMap/Secret changes, even though only its
+        # data changed and the pod spec didn't. Without this, `helm upgrade` updates the
+        # ConfigMap/Secret in place but leaves running pods on the old mounted content (e.g.
+        # flipping database.external.enabled updated the appconfig ConfigMap but pods kept
+        # running on SQLite until a manual `kubectl rollout restart`).
+        checksum/appconfig: {{ include (print $.Template.BasePath "/configmap-appconfig.yaml") . | sha256sum }}
+        checksum/dynamic-plugins: {{ include (print $.Template.BasePath "/configmap-dynamic-plugins.yaml") . | sha256sum }}
+        checksum/credentials: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
     spec:
       serviceAccountName: {{ include "veecode-devportal-platform.serviceAccountName" . }}
       # Only mount the SA token when cluster RBAC is granted (in-cluster k8s plugin access).

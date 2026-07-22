@@ -97,31 +97,46 @@ dynamicPlugins: {}
 #     - package: "oci://${PLUGIN_REGISTRY}/<workspace>:bs_${BACKSTAGE_VERSION}!<selector>"
 #       disabled: false
 
+# ── Persistence (opt-in — DEFAULT IS STATELESS) ─────────────────────────────────
+# Both volumes are OFF by default. The recommended production path is external
+# PostgreSQL (see `database.external` below) with NO PersistentVolumeClaim: the pod
+# carries no AZ-bound state and self-recovers from a node/Spot loss (ADR-014).
+#
+# A bare install with BOTH `persistence.data.enabled=false` AND
+# `database.external.enabled=false` is REFUSED at render time (see
+# templates/deployment.yaml) — SQLite on an ephemeral volume loses all data on every
+# restart. You must consciously choose external Postgres OR the SQLite volume.
 persistence:
-  # /app/data — per-plugin SQLite DBs + extensions-install.yaml. MUST be a directory PVC
-  # (atomic-rename writes fail on a single-file mount). Losing this wipes catalog/marketplace state.
+  # /app/data — SQLite DBs + extensions-install.yaml. Enable ONLY for the dev / single-node
+  # SQLite path. Not needed with external Postgres (marketplace state lives in the DB and
+  # /app/data is regenerated at boot). A RWO PVC pins the pod to one AZ. MUST be a directory
+  # PVC — atomic-rename writes fail on a single-file mount.
   data:
-    enabled: true
+    enabled: false
     size: 1Gi
     accessModes:
       - ReadWriteOnce
     storageClass: ""
     existingClaim: ""
-  # /app/dynamic-plugins-root — OCI bundle cache. Seeded from the image's baked plugins by an
-  # initContainer (a k8s PVC mounts empty and would otherwise MASK the 7 preInstalled plugins —
-  # homepage, global-header, marketplace catalog ingester, etc.). Without it, every pod re-pulls plugins.
+  # /app/dynamic-plugins-root — pure OCI bundle CACHE (not state). Off by default: the dir is
+  # ephemeral and a cold boot re-pulls the selected bundles (~60-90s). Enable only to speed up
+  # boots on a single node; a RWO PVC also pins the pod to one AZ. When on, a seed initContainer
+  # copies the image's 7 baked plugins in so the empty PVC doesn't mask them.
   plugins:
-    enabled: true
+    enabled: false
     size: 2Gi
     accessModes:
       - ReadWriteOnce
     storageClass: ""
     existingClaim: ""
 
-# External PostgreSQL (opt-in, for scale/HA). When enabled, a backend.database block is injected into
-# app-config.local.yaml using ${PG_*} resolved from the credentials Secret. NO bundled subchart.
-# Provide PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DATABASE in existingSecret/credentials.
-# Only then is replicaCount > 1 safe (default SQLite is single-writer / single-replica).
+# External PostgreSQL — the RECOMMENDED, stateless production database (ADR-014). When enabled, a
+# backend.database block is injected into app-config.local.yaml using ${PG_*} from the credentials
+# Secret. NO bundled subchart — bring your own (managed HA / RDS Multi-AZ preferred; the DB becomes
+# the single durable dependency). Provide PG_HOST, PG_PORT, PG_USER, PG_PASSWORD, PG_DATABASE via
+# existingSecret/credentials — render fails fast if enabled without them. The PG user needs CREATEDB:
+# Backstage creates several backstage_plugin_* databases on first boot. With external PG, replicaCount
+# > 1 is safe (SQLite is single-writer / single-replica).
 database:
   external:
     enabled: false

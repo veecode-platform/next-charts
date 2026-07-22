@@ -1,7 +1,13 @@
 # Negative test: github-auth selected but GITHUB_PAT is omitted from credentials.
 # Expectation on a real cluster: the pod terminates with exit 78 and a "requires GITHUB_PAT" message.
+# persistence.data is enabled so the chart RENDERS — this negative is a runtime failure (exit 78),
+# not a render-time one; the stateless persistence guard must not pre-empt it.
 presets:
   - github-auth
+
+persistence:
+  data:
+    enabled: true
 
 credentials:
   GITHUB_ORG: my-org

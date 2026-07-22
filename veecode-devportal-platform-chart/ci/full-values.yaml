@@ -1,12 +1,22 @@
-# Typical composition: curated baseline + GitHub integration + GitHub sign-in.
+# Typical production composition: curated baseline + GitHub integration + GitHub sign-in,
+# on external PostgreSQL (stateless, no PVC — the recommended default posture).
 # Dummy credentials — for `helm template`/lint only (NOT a working deployment).
 presets:
   - recommended
   - github
   - github-auth
 
+database:
+  external:
+    enabled: true
+
 credentials:
   GITHUB_PAT: ghp_dummy0000000000000000000000000000
   GITHUB_ORG: my-org
   GITHUB_AUTH_CLIENT_ID: Iv1.dummyclientid
   GITHUB_AUTH_CLIENT_SECRET: dummyclientsecret
+  PG_HOST: postgres.example.com
+  PG_PORT: "5432"
+  PG_USER: devportal
+  PG_PASSWORD: dummy-pg-password
+  PG_DATABASE: backstage

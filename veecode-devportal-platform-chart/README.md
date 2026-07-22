@@ -1,19 +1,22 @@
 # veecode-devportal-platform
 
-Helm chart for **VeeCode DevPortal V2** (the `devportal-platform` image line). Standalone chart — it does **not** wrap the upstream Backstage chart. Built from the V2 runtime contract (`entrypoint.sh`): presets-driven enablement, persistent SQLite by default, and plugin install owned by the image entrypoint (no install initContainer).
+Helm chart for **VeeCode DevPortal V2** (the `devportal-platform` image line). Standalone chart — it does **not** wrap the upstream Backstage chart. Built from the V2 runtime contract (`entrypoint.sh`): presets-driven enablement, **stateless on external PostgreSQL by default** (SQLite-on-PVC is an opt-in dev path), and plugin install owned by the image entrypoint (no install initContainer).
 
 > This is a different chart from the V1 `veecode-devportal` (which deploys the 1.x distro). Use this one for `docker.io/veecode/devportal:2.0.0+`.
 
 ## Quick start
 
-**Installing DevPortal?** Point straight at the published repo URL — not a local path, and no need to `helm repo add` first:
+**Installing DevPortal?** Point straight at the published repo URL — not a local path, and no need to `helm repo add` first. The chart is **stateless on external PostgreSQL by default** and refuses a bare install — the Secret must also carry `PG_HOST`/`PG_PORT`/`PG_USER`/`PG_PASSWORD`/`PG_DATABASE` (the PG user needs `CREATEDB`):
 
 ```sh
 helm install devportal veecode-devportal-platform \
   --repo https://veecode-platform.github.io/next-charts \
+  --set database.external.enabled=true \
   --set 'presets={recommended,github,github-auth}' \
-  --set existingSecret=my-devportal-creds        # Secret holding the preset's required vars
+  --set existingSecret=my-devportal-creds        # Secret holding the preset vars + PG_*
 ```
+
+> Just kicking the tyres on a single node with no database? Swap the `database.external.enabled` line for `--set persistence.data.enabled=true` to run SQLite on a PVC instead (dev only — a ReadWriteOnce PVC pins the pod to one AZ).
 
 Prefer a persistent local alias (handy for repeated `helm search`/`helm show values`)? Add the repo once, then swap `veecode-devportal-platform --repo <url>` for `next-charts/veecode-devportal-platform`:
 
@@ -28,9 +31,12 @@ Full walkthrough (Secret creation, PostgreSQL, ingress): [Deploy to Kubernetes](
 
 ```sh
 helm install dp ./veecode-devportal-platform-chart \
+  --set persistence.data.enabled=true \
   --set 'presets={recommended,github,github-auth}' \
   --set existingSecret=my-devportal-creds        # Secret holding the preset's required vars
 ```
+
+(`persistence.data.enabled=true` picks the SQLite-on-PVC dev path so the guard lets the local install through; use `--set database.external.enabled=true` + PG creds instead to mirror production.)
 
 Then:
 
@@ -78,25 +84,29 @@ Provide the required variables through **one** of:
 
 ## Storage
 
-Two PersistentVolumeClaims, both **required** for production:
+Both PVCs default to **disabled** — the recommended posture is stateless on external PostgreSQL, where the pod needs no PVC at all (it schedules in any availability zone and self-recovers from a node loss; `/app/data` is ephemeral and `extensions-install.yaml` is regenerated from the database at boot). The two PVCs are opt-in, for the SQLite / single-node dev path only:
 
-- `/app/data` (`persistence.data`) — SQLite DBs + marketplace state. Must be a directory PVC. Losing it wipes catalog/marketplace state on restart.
-- `/app/dynamic-plugins-root` (`persistence.plugins`) — OCI plugin bundle cache. A **seed initContainer** copies the image's baked plugins into this PVC on first boot (a bare PVC would otherwise mask the 7 pre-installed plugins, including the homepage, global header, and marketplace catalog). On restart the copy no-clobbers, so the download cache is reused.
+- `/app/data` (`persistence.data`, off by default) — SQLite DBs + marketplace state. Must be a directory PVC. Losing it wipes catalog/marketplace state on restart, so it is **required if you run SQLite** (`database.external.enabled=false`). A ReadWriteOnce PVC pins the pod to one availability zone.
+- `/app/dynamic-plugins-root` (`persistence.plugins`, off by default) — OCI plugin bundle cache. Purely a speed-up: with it off, the baked plugins ship in the image and OCI plugins re-resolve at boot (~60–90s cold start). Enable it and a **seed initContainer** copies the image's baked plugins into the PVC on first boot (a bare PVC would otherwise mask the 7 pre-installed plugins, including the homepage, global header, and marketplace catalog); on restart the copy no-clobbers, so the download cache is reused.
 
-> **On image upgrade:** the seed uses `cp -rn` (no-clobber), matching the docker-compose named-volume behaviour, so it will not overwrite pre-installed plugin bytes already in the PVC. After bumping `image.tag` to a build with updated pre-installed plugins, delete the plugins PVC (or point `persistence.plugins.existingClaim` at a fresh one) so the new versions are seeded — the OCI-downloaded plugins re-resolve automatically.
+> **On image upgrade (only if `persistence.plugins.enabled`):** the seed uses `cp -rn` (no-clobber), matching the docker-compose named-volume behaviour, so it will not overwrite pre-installed plugin bytes already in the PVC. After bumping `image.tag` to a build with updated pre-installed plugins, delete the plugins PVC (or point `persistence.plugins.existingClaim` at a fresh one) so the new versions are seeded — the OCI-downloaded plugins re-resolve automatically.
 
 ## Database
 
-Default is **persistent SQLite** on the `/app/data` PVC with `replicaCount: 1`. For scale/HA, set:
+**Default is stateless on external PostgreSQL** (`database.external.enabled=true`) with no data PVC — the recommended production posture. Provide `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE` in the credentials Secret (the PG user needs `CREATEDB` — Backstage creates several `backstage_plugin_*` databases). The chart does **not** bundle a PostgreSQL subchart — point at an external/managed instance (RDS Multi-AZ or equivalent). External Postgres also unblocks `replicaCount: 2`.
+
+The dev alternative is **persistent SQLite** on the `/app/data` PVC with `replicaCount: 1`:
 
 ```yaml
 database:
   external:
-    enabled: true   # injects a backend.database (client: pg) block into app-config.local.yaml
-replicaCount: 2
+    enabled: false
+persistence:
+  data:
+    enabled: true   # required for SQLite — the guard blocks a bare install otherwise
 ```
 
-and provide `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE` in the credentials Secret. The chart does **not** bundle a PostgreSQL subchart — point at an external/managed instance.
+A render-time guard refuses a bare install that would run SQLite on an ephemeral volume (no external DB **and** no data PVC), since that silently loses all state on restart — you must pick one of the two paths above.
 
 ## Key values
 
@@ -105,7 +115,8 @@ and provide `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE` in the
 | `image.repository` / `image.tag` | `docker.io/veecode/devportal` / `2.0.0` | Pinned; never `:latest`. |
 | `presets` | `[recommended]` | → `VEECODE_PRESETS`. |
 | `existingSecret` / `credentials` | `""` / `{}` | Preset credentials. |
-| `persistence.data` / `persistence.plugins` | enabled, 1Gi / 2Gi | The two PVCs. |
+| `persistence.data` / `persistence.plugins` | **disabled** (1Gi / 2Gi when enabled) | Opt-in SQLite/cache PVCs; off by default (stateless). |
+| `database.external.enabled` | `false` | Set `true` for the default stateless posture (+ PG_* in the Secret). |
 | `pluginRegistry` / `catalogIndexImage` | `""` | Mirror / air-gap overrides. |
 | `theme.*` | `""` | `THEME_*` env (or use the `veecode-theme` preset). |
 | `appConfig` | `{}` | Minimal operator `app-config.local.yaml` overrides. |

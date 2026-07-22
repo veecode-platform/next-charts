@@ -1,2 +1,8 @@
 # Core only — no presets, no credentials. Boots with catalog + global header.
+# Dev / single-node: SQLite on a PVC (opt-in under the stateless-by-default posture;
+# no external database configured).
 presets: []
+
+persistence:
+  data:
+    enabled: true

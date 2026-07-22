@@ -2,6 +2,29 @@ VeeCode DevPortal V2 — release "{{ .Release.Name }}" in namespace "{{ .Release
 
 Presets enabled: {{ join "," .Values.presets | default "(none — core only)" }}
 
+{{- $dataIsPVC := or .Values.persistence.data.enabled .Values.persistence.data.existingClaim }}
+{{- if .Values.database.external.enabled }}
+{{- if $dataIsPVC }}
+
+Persistence: external PostgreSQL — but a data PVC is ALSO mounted at /app/data. That volume is
+redundant with external Postgres (marketplace state lives in the DB). For a fully stateless,
+AZ-independent pod, set persistence.data.enabled=false (and drop persistence.data.existingClaim).
+{{- else }}
+
+Persistence: STATELESS on external PostgreSQL (recommended). No data PVC — the pod schedules
+in any availability zone and self-recovers from a node/Spot loss. /app/data is ephemeral;
+extensions-install.yaml is regenerated from the database at boot. Confirm in the logs:
+   VEECODE prestep: regenerated /app/data/extensions-install.yaml with N selection(s) from the database
+(A "WARNING — could not read marketplace_installations" line means the DB was unreachable —
+ check the PG_* credentials and TLS settings.)
+{{- end }}
+{{- else }}
+
+Persistence: SQLite on a persistent volume (dev / single-node). NOT recommended for
+production — a ReadWriteOnce PVC pins the pod to one availability zone. For a stateless,
+AZ-independent deployment, migrate to external PostgreSQL (--set database.external.enabled=true).
+{{- end }}
+
 1. First boot pulls OCI plugins (can take a few minutes). Watch the rollout:
    kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "veecode-devportal-platform.fullname" . }} --timeout=10m
 
@@ -23,7 +46,7 @@ For production, prefer `existingSecret` (a Secret you manage) to keep secrets ou
 {{- if gt (int .Values.replicaCount) 1 }}
 {{- if not .Values.database.external.enabled }}
 
-WARNING: replicaCount > 1 with the default SQLite database. SQLite is single-writer and the data
+WARNING: replicaCount > 1 with SQLite (no external database). SQLite is single-writer and the data
 PVC is ReadWriteOnce — run a single replica, or set database.external.enabled and point at an
 external PostgreSQL.
 {{- end }}

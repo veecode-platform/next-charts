@@ -1,0 +1,131 @@
+name: Ingest devportal chart
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Stable devportal chart version to ingest (for example, 0.1.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: ingest-devportal-chart
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate requested version
+        id: validate
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ ! "${VERSION_INPUT}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::version must match x.y.z; refusing '${VERSION_INPUT}'"
+            exit 1
+          fi
+          echo "version=${VERSION_INPUT}" >> "${GITHUB_OUTPUT}"
+
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.4
+
+      - name: Download and verify the public release assets
+        id: verify
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+          PACKAGE_DIR: ${{ runner.temp }}/devportal-chart-ingest
+        run: |
+          set -euo pipefail
+
+          package_name="devportal-${VERSION}.tgz"
+          checksum_name="${package_name}.sha256"
+          release_url="https://github.com/veecode-platform/devportal-chart/releases/download/chart-v${VERSION}"
+          package_path="${PACKAGE_DIR}/${package_name}"
+          checksum_path="${PACKAGE_DIR}/${checksum_name}"
+          mkdir -p "${PACKAGE_DIR}"
+
+          curl --fail --location --silent --show-error \
+            "${release_url}/${package_name}" \
+            --output "${package_path}"
+          curl --fail --location --silent --show-error \
+            "${release_url}/${checksum_name}" \
+            --output "${checksum_path}"
+
+          (
+            cd "${PACKAGE_DIR}"
+            sha256sum --check --strict "${checksum_name}"
+          )
+
+          chart_metadata="$(helm show chart "${package_path}")"
+          embedded_name="$(printf '%s\n' "${chart_metadata}" | awk -F': ' '$1 == "name" { print $2; exit }')"
+          embedded_version="$(printf '%s\n' "${chart_metadata}" | awk -F': ' '$1 == "version" { print $2; exit }')"
+          if [ "${embedded_name}" != "devportal" ]; then
+            echo "::error::downloaded chart embeds name ${embedded_name:-<empty>}, expected devportal"
+            exit 1
+          fi
+          if [ "${embedded_version}" != "${VERSION}" ]; then
+            echo "::error::downloaded chart embeds version ${embedded_version:-<empty>}, expected ${VERSION}"
+            exit 1
+          fi
+
+          echo "package_name=${package_name}" >> "${GITHUB_OUTPUT}"
+          echo "package_path=${package_path}" >> "${GITHUB_OUTPUT}"
+
+      - name: Copy the immutable package into docs/
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+          PACKAGE_NAME: ${{ steps.verify.outputs.package_name }}
+          PACKAGE_PATH: ${{ steps.verify.outputs.package_path }}
+        run: |
+          set -euo pipefail
+
+          destination="docs/${PACKAGE_NAME}"
+          if [ -e "${destination}" ] || [ -L "${destination}" ]; then
+            echo "::error::${destination} already exists; published chart versions are immutable"
+            exit 1
+          fi
+          mkdir -p docs
+          cp -- "${PACKAGE_PATH}" "${destination}"
+
+      - name: Commit the ingested package to main
+        id: commit
+        env:
+          VERSION: ${{ steps.validate.outputs.version }}
+          PACKAGE_NAME: ${{ steps.verify.outputs.package_name }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- "docs/${PACKAGE_NAME}"
+          if git diff --cached --quiet; then
+            echo "::error::no staged package change; refusing to dispatch publication"
+            exit 1
+          fi
+          # The follow-up is an explicit workflow_dispatch, so the GITHUB_TOKEN push
+          # recursion guard and this [skip ci] marker cannot suppress it.
+          git commit -m "publish: ingest devportal ${VERSION} [skip ci]"
+          git push origin HEAD:main
+          echo "committed=true" >> "${GITHUB_OUTPUT}"
+
+      - name: Trigger release-charts (publish the ingested chart)
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh workflow run release-charts.yml --ref main --repo "${GITHUB_REPOSITORY}"
+          echo "Dispatched release-charts.yml on main."

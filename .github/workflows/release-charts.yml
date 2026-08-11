@@ -13,6 +13,11 @@ on:
     paths:
       - "veecode-devportal-chart/**"
       - "veecode-devportal-platform-chart/**"
+      # Package ingress for charts built in their own repos (e.g.
+      # veecode-platform/devportal-chart): a package-only PR drops the .tgz
+      # here and this workflow indexes it after merge. The packaging loop
+      # skips foreign .tgz files; helm repo index picks them up.
+      - "docs/*.tgz"
 
 permissions:
   contents: write

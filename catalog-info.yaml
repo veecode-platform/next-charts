@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: next-charts
+  description: >-
+    Public Helm chart index (catalog) for the VeeCode platform. Receives
+    releases from devportal-chart (manual ingest) and the legacy V2
+    devportal-platform (automated repository_dispatch); consumed by vkdr
+    formulas and by client tenants (e.g. Terraform helm_release).
+  annotations:
+    github.com/project-slug: veecode-platform/next-charts
+  tags: [helm, distribution]
+spec:
+  type: helm-chart
+  lifecycle: production
+  owner: group:default/veecode-platform
+  system: veecode-devportal

@@ -12,8 +12,10 @@ from `main`: `docs/index.yaml` plus the packaged `.tgz` files.
 | `veecode-devportal-platform` | 2.x | `veecode-devportal-platform-chart/` here | `sync-platform-version.yml` runs daily, on dispatch or on `platform-image-released`, requires `appVersion` to equal the image tag, and bumps the chart; see its `RELEASE.md` |
 | `veecode-devportal` | 1.x | `veecode-devportal-chart/` here | `make release` with `update_version.sh`; see [veecode-devportal-chart/AGENTS.md](veecode-devportal-chart/AGENTS.md) |
 
-`release-charts.yml` then packages every chart version missing from `docs/` and
-merges `docs/index.yaml`. The `devportal` package is never rebuilt here: this
+`release-charts.yml` then packages the current `Chart.yaml` version of the two
+local charts when its `.tgz` is missing from `docs/`, and merges
+`docs/index.yaml`. It does not recover an intermediate version that was never
+packaged. The `devportal` package is never rebuilt here: this
 repository publishes the exact package `devportal-chart` released.
 
 ## Verify a change

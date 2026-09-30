@@ -112,7 +112,7 @@ A render-time guard refuses a bare install that would run SQLite on an ephemeral
 
 | Key | Default | Notes |
 | --- | --- | --- |
-| `image.repository` / `image.tag` | `docker.io/veecode/devportal` / `2.0.0` | Pinned; never `:latest`. |
+| `image.repository` / `image.tag` | `docker.io/veecode/devportal` / the release this chart version pins (`appVersion` in `Chart.yaml`) | Pinned; never `:latest`. |
 | `presets` | `[recommended]` | → `VEECODE_PRESETS`. |
 | `existingSecret` / `credentials` | `""` / `{}` | Preset credentials. |
 | `persistence.data` / `persistence.plugins` | **disabled** (1Gi / 2Gi when enabled) | Opt-in SQLite/cache PVCs; off by default (stateless). |

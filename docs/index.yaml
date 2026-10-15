@@ -15,8 +15,55 @@ entries:
       veecode.dev/upstream-ref: backstage-7.0.1
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
+    appVersion: 3.1.0
+    created: "2026-10-15T21:14:26.564171722Z"
+    dependencies:
+    - name: common
+      repository: https://charts.bitnami.com/bitnami
+      tags:
+      - bitnami-common
+      version: 2.40.0
+    - alias: upstream
+      name: backstage
+      repository: file://./vendor/backstage/charts/backstage/
+      version: 2.8.0
+    description: 'A Helm chart for deploying VeeCode DevPortal, a VeeCode distribution
+      of Backstage. '
+    digest: 061ab853c41cf05d5cc537d5c7c331290c6dd9c46cc756a6e6546a7acdc06a3e
+    home: https://docs.platform.vee.codes
+    icon: https://veecode-platform.github.io/support/logos/logo.svg
+    keywords:
+    - backstage
+    - devportal
+    - idp
+    - veecode
+    kubeVersion: '>= 1.27.0-0'
+    maintainers:
+    - name: VeeCode
+      url: https://veecode.com
+    name: devportal
+    sources:
+    - https://github.com/veecode-platform/devportal-chart
+    type: application
+    urls:
+    - https://veecode-platform.github.io/next-charts/devportal-1.1.0.tgz
+    version: 1.1.0
+  - annotations:
+      artifacthub.io/category: integration-delivery
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: support
+          url: https://github.com/veecode-platform/devportal-chart/issues
+        - name: Chart Source
+          url: https://github.com/veecode-platform/devportal-chart
+      veecode.dev/upstream-chart-name: backstage
+      veecode.dev/upstream-chart-version: 7.0.1
+      veecode.dev/upstream-commit: e476f2987dc3a4d764b10fab5c2fa9958f70c2d0
+      veecode.dev/upstream-ref: backstage-7.0.1
+      veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
+    apiVersion: v2
     appVersion: 3.0.3
-    created: "2026-10-13T17:31:01.317897486Z"
+    created: "2026-10-15T21:14:26.544641702Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -63,7 +110,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.3
-    created: "2026-10-13T17:31:01.300817475Z"
+    created: "2026-10-15T21:14:26.527077509Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -110,7 +157,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.2
-    created: "2026-10-13T17:31:01.282557702Z"
+    created: "2026-10-15T21:14:26.506288271Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -157,7 +204,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.1
-    created: "2026-10-13T17:31:01.25896472Z"
+    created: "2026-10-15T21:14:26.487705163Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -204,7 +251,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0
-    created: "2026-10-13T17:31:01.240187812Z"
+    created: "2026-10-15T21:14:26.469281792Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -251,7 +298,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.10
-    created: "2026-10-13T17:31:01.061897217Z"
+    created: "2026-10-15T21:14:26.292677167Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -298,7 +345,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.9
-    created: "2026-10-13T17:31:01.043753969Z"
+    created: "2026-10-15T21:14:26.26757855Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -345,7 +392,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.9
-    created: "2026-10-13T17:31:01.024522061Z"
+    created: "2026-10-15T21:14:26.250314596Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -392,7 +439,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:01.006308673Z"
+    created: "2026-10-15T21:14:26.232483627Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -439,7 +486,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.988292087Z"
+    created: "2026-10-15T21:14:26.207464559Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -486,7 +533,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.971185159Z"
+    created: "2026-10-15T21:14:26.187242165Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -533,7 +580,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.952027763Z"
+    created: "2026-10-15T21:14:26.170153841Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -580,7 +627,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.934159539Z"
+    created: "2026-10-15T21:14:26.146824853Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -627,7 +674,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.91516296Z"
+    created: "2026-10-15T21:14:26.128389554Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -674,7 +721,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.897136534Z"
+    created: "2026-10-15T21:14:26.110321226Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -721,7 +768,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.878178167Z"
+    created: "2026-10-15T21:14:26.09266833Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -768,7 +815,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.860144344Z"
+    created: "2026-10-15T21:14:26.076391885Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -815,7 +862,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.6
-    created: "2026-10-13T17:31:00.834118249Z"
+    created: "2026-10-15T21:14:26.059578072Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -862,7 +909,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.5
-    created: "2026-10-13T17:31:00.812554789Z"
+    created: "2026-10-15T21:14:26.042588616Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -909,7 +956,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.4
-    created: "2026-10-13T17:31:00.793788326Z"
+    created: "2026-10-15T21:14:26.024288829Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -956,7 +1003,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.4
-    created: "2026-10-13T17:31:00.77802795Z"
+    created: "2026-10-15T21:14:26.006998845Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1003,7 +1050,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.2
-    created: "2026-10-13T17:31:00.761757343Z"
+    created: "2026-10-15T21:14:25.990022181Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1050,7 +1097,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.218740014Z"
+    created: "2026-10-15T21:14:26.452680001Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1097,7 +1144,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.198934434Z"
+    created: "2026-10-15T21:14:26.426306157Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1144,7 +1191,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.172336108Z"
+    created: "2026-10-15T21:14:26.404290636Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1191,7 +1238,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.152592775Z"
+    created: "2026-10-15T21:14:26.384833853Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1238,7 +1285,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.131631376Z"
+    created: "2026-10-15T21:14:26.36461473Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1285,7 +1332,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.107583346Z"
+    created: "2026-10-15T21:14:26.33903317Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1332,7 +1379,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:01.087035088Z"
+    created: "2026-10-15T21:14:26.316843522Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1379,7 +1426,7 @@ entries:
       veecode.dev/upstream-repository: https://github.com/redhat-developer/rhdh-chart
     apiVersion: v2
     appVersion: 3.0.0-beta.1
-    created: "2026-10-13T17:31:00.7451567Z"
+    created: "2026-10-15T21:14:25.97323283Z"
     dependencies:
     - name: common
       repository: https://charts.bitnami.com/bitnami
@@ -1414,7 +1461,7 @@ entries:
   veecode-devportal:
   - apiVersion: v2
     appVersion: 1.4.5
-    created: "2026-10-13T17:31:01.430516717Z"
+    created: "2026-10-15T21:14:26.681981565Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1444,7 +1491,7 @@ entries:
     version: 2.0.2
   - apiVersion: v2
     appVersion: 1.0.17
-    created: "2026-10-13T17:31:01.354797738Z"
+    created: "2026-10-15T21:14:26.604259055Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1474,7 +1521,7 @@ entries:
     version: 1.0.14
   - apiVersion: v2
     appVersion: 1.0.16
-    created: "2026-10-13T17:31:01.34526525Z"
+    created: "2026-10-15T21:14:26.594425744Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1504,7 +1551,7 @@ entries:
     version: 1.0.13
   - apiVersion: v2
     appVersion: 1.0.16
-    created: "2026-10-13T17:31:01.334724963Z"
+    created: "2026-10-15T21:14:26.583918643Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1534,7 +1581,7 @@ entries:
     version: 1.0.12
   - apiVersion: v2
     appVersion: 1.0.16
-    created: "2026-10-13T17:31:01.420833113Z"
+    created: "2026-10-15T21:14:26.671680296Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1564,7 +1611,7 @@ entries:
     version: 1.0.9
   - apiVersion: v2
     appVersion: 1.0.13
-    created: "2026-10-13T17:31:01.410327136Z"
+    created: "2026-10-15T21:14:26.662338476Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1594,7 +1641,7 @@ entries:
     version: 1.0.7
   - apiVersion: v2
     appVersion: 1.0.13
-    created: "2026-10-13T17:31:01.397158773Z"
+    created: "2026-10-15T21:14:26.652719623Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1624,7 +1671,7 @@ entries:
     version: 1.0.6
   - apiVersion: v2
     appVersion: 1.0.11
-    created: "2026-10-13T17:31:01.388230304Z"
+    created: "2026-10-15T21:14:26.642580853Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1654,7 +1701,7 @@ entries:
     version: 1.0.5
   - apiVersion: v2
     appVersion: 1.0.10
-    created: "2026-10-13T17:31:01.379446454Z"
+    created: "2026-10-15T21:14:26.629935465Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1684,7 +1731,7 @@ entries:
     version: 1.0.4
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2026-10-13T17:31:01.37038575Z"
+    created: "2026-10-15T21:14:26.620667447Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1714,7 +1761,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2026-10-13T17:31:01.362230033Z"
+    created: "2026-10-15T21:14:26.61199537Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1730,7 +1777,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 0.23.2
-    created: "2026-10-13T17:31:01.325476271Z"
+    created: "2026-10-15T21:14:26.573238071Z"
     dependencies:
     - alias: upstream
       name: backstage
@@ -1747,7 +1794,7 @@ entries:
   veecode-devportal-platform:
   - apiVersion: v2
     appVersion: 2.2.3
-    created: "2026-10-13T17:31:01.439308936Z"
+    created: "2026-10-15T21:14:26.690026253Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       stateless external-PostgreSQL by default (opt-in SQLite/PVC), entrypoint-owned
       plugin install.
@@ -1773,7 +1820,7 @@ entries:
     version: 0.5.2
   - apiVersion: v2
     appVersion: 2.2.2
-    created: "2026-10-13T17:31:01.437842192Z"
+    created: "2026-10-15T21:14:26.68928131Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       stateless external-PostgreSQL by default (opt-in SQLite/PVC), entrypoint-owned
       plugin install.
@@ -1799,7 +1846,7 @@ entries:
     version: 0.5.1
   - apiVersion: v2
     appVersion: 2.2.1
-    created: "2026-10-13T17:31:01.437004286Z"
+    created: "2026-10-15T21:14:26.688565712Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       stateless external-PostgreSQL by default (opt-in SQLite/PVC), entrypoint-owned
       plugin install.
@@ -1825,7 +1872,7 @@ entries:
     version: 0.5.0
   - apiVersion: v2
     appVersion: 2.2.1
-    created: "2026-10-13T17:31:01.436292767Z"
+    created: "2026-10-15T21:14:26.687826521Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: 4e9aea2fa7d75419cce3661396f171a6cf79bc20eb74eeba77bce26acaa43abe
@@ -1850,7 +1897,7 @@ entries:
     version: 0.4.2
   - apiVersion: v2
     appVersion: 2.2.1
-    created: "2026-10-13T17:31:01.435640008Z"
+    created: "2026-10-15T21:14:26.687121413Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: 14eb9b48334ecc5f0b9e37266406c775b189818bea89ebb3983ea73ff5525559
@@ -1875,7 +1922,7 @@ entries:
     version: 0.4.1
   - apiVersion: v2
     appVersion: 2.2.0
-    created: "2026-10-13T17:31:01.434991456Z"
+    created: "2026-10-15T21:14:26.686464695Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: 1a9fd4a42728a5ebc549cd0b2a355b98998f1a0c5e8cfc394aec44f6e1358060
@@ -1900,7 +1947,7 @@ entries:
     version: 0.4.0
   - apiVersion: v2
     appVersion: 2.1.3
-    created: "2026-10-13T17:31:01.434339238Z"
+    created: "2026-10-15T21:14:26.685843323Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: eded567fe54a5965fa1dd5e7fbd89f5c3d0df2154bb5a17ae05698315529d208
@@ -1925,7 +1972,7 @@ entries:
     version: 0.3.3
   - apiVersion: v2
     appVersion: 2.1.2
-    created: "2026-10-13T17:31:01.433701647Z"
+    created: "2026-10-15T21:14:26.68520498Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: b411293c57b56bc2219dd07674d48a02d512e5f417168a184b7de9833f283680
@@ -1950,7 +1997,7 @@ entries:
     version: 0.3.2
   - apiVersion: v2
     appVersion: 2.1.1
-    created: "2026-10-13T17:31:01.433086367Z"
+    created: "2026-10-15T21:14:26.684556047Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: f98d247c54dd39a8e49759e2ed35774cd6d1b3ffeb7cd325440b5ce344f61eb8
@@ -1975,7 +2022,7 @@ entries:
     version: 0.3.1
   - apiVersion: v2
     appVersion: 2.1.0
-    created: "2026-10-13T17:31:01.432446021Z"
+    created: "2026-10-15T21:14:26.683933473Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: f8ce827d78b1946f0927ac8882127c330d746d13482ed220b2b370cdfa6d44d2
@@ -2000,7 +2047,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: 2.0.0
-    created: "2026-10-13T17:31:01.431812758Z"
+    created: "2026-10-15T21:14:26.683278098Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: 4c10cba37adc9290f3eb243a156ad2e47de885ec7a16587f5c2351d9fafc1086
@@ -2025,7 +2072,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 2.0.0
-    created: "2026-10-13T17:31:01.431164978Z"
+    created: "2026-10-15T21:14:26.682623936Z"
     description: Helm chart for VeeCode DevPortal V2 (devportal-platform) — presets-driven,
       persistent SQLite by default, entrypoint-owned plugin install.
     digest: b0ff9e837be1f8c10dd18f662b2c468aeaae626c508869268a18ee57879eea0d
@@ -2048,4 +2095,4 @@ entries:
     urls:
     - https://veecode-platform.github.io/next-charts/veecode-devportal-platform-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-13T17:31:00.727052598Z"
+generated: "2026-10-15T21:14:25.955123789Z"
